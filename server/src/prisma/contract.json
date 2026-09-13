@@ -4,8 +4,16 @@
   "target": "postgres",
   "profileHash": "3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2",
   "roots": {
-    "post": {
-      "model": "Post",
+    "download": {
+      "model": "Download",
+      "namespace": "public"
+    },
+    "file": {
+      "model": "File",
+      "namespace": "public"
+    },
+    "shareLink": {
+      "model": "ShareLink",
       "namespace": "public"
     },
     "user": {
@@ -16,23 +24,102 @@
   "domain": {
     "namespaces": {
       "public": {
+        "enum": {
+          "UserRole": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "USER",
+                "value": "USER"
+              },
+              {
+                "name": "ADMIN",
+                "value": "ADMIN"
+              }
+            ]
+          }
+        },
         "models": {
-          "Post": {
+          "Download": {
             "fields": {
-              "authorId": {
+              "downloadedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/int4@1",
                   "kind": "scalar"
                 }
               },
-              "content": {
+              "ipAddress": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               },
+              "shareLinkId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "userAgent": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "shareLink": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "shareLinkId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "ShareLink",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "downloadedAt": {
+                  "column": "downloadedAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "ipAddress": {
+                  "column": "ipAddress"
+                },
+                "shareLinkId": {
+                  "column": "shareLinkId"
+                },
+                "userAgent": {
+                  "column": "userAgent"
+                }
+              },
+              "namespaceId": "public",
+              "table": "download"
+            }
+          },
+          "File": {
+            "fields": {
               "createdAt": {
                 "nullable": false,
                 "type": {
@@ -47,7 +134,35 @@
                   "kind": "scalar"
                 }
               },
-              "title": {
+              "mimeType": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "originalName": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "ownerId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "size": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int8@1",
+                  "kind": "scalar"
+                }
+              },
+              "storageKey": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
@@ -63,12 +178,12 @@
               }
             },
             "relations": {
-              "author": {
+              "owner": {
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
                   "localFields": [
-                    "authorId"
+                    "ownerId"
                   ],
                   "targetFields": [
                     "id"
@@ -78,35 +193,216 @@
                   "model": "User",
                   "namespace": "public"
                 }
+              },
+              "shareLinks": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "fileId"
+                  ]
+                },
+                "to": {
+                  "model": "ShareLink",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
               "fields": {
-                "authorId": {
-                  "column": "authorId"
-                },
-                "content": {
-                  "column": "content"
-                },
                 "createdAt": {
                   "column": "createdAt"
                 },
                 "id": {
                   "column": "id"
                 },
-                "title": {
-                  "column": "title"
+                "mimeType": {
+                  "column": "mimeType"
+                },
+                "originalName": {
+                  "column": "originalName"
+                },
+                "ownerId": {
+                  "column": "ownerId"
+                },
+                "size": {
+                  "column": "size"
+                },
+                "storageKey": {
+                  "column": "storageKey"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
                 }
               },
               "namespaceId": "public",
-              "table": "post"
+              "table": "file"
+            }
+          },
+          "ShareLink": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "deleteAfterDownload": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "downloadCount": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "expiresAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "fileId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "maxDownloads": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "passwordHash": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "revoked": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "token": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "downloads": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "shareLinkId"
+                  ]
+                },
+                "to": {
+                  "model": "Download",
+                  "namespace": "public"
+                }
+              },
+              "file": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "fileId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "File",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "deleteAfterDownload": {
+                  "column": "deleteAfterDownload"
+                },
+                "downloadCount": {
+                  "column": "downloadCount"
+                },
+                "expiresAt": {
+                  "column": "expiresAt"
+                },
+                "fileId": {
+                  "column": "fileId"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "maxDownloads": {
+                  "column": "maxDownloads"
+                },
+                "passwordHash": {
+                  "column": "passwordHash"
+                },
+                "revoked": {
+                  "column": "revoked"
+                },
+                "token": {
+                  "column": "token"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "shareLink"
             }
           },
           "User": {
             "fields": {
+              "clerkId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "createdAt": {
                 "nullable": false,
                 "type": {
@@ -135,6 +431,19 @@
                   "kind": "scalar"
                 }
               },
+              "role": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "UserRole",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
               "updatedAt": {
                 "nullable": false,
                 "type": {
@@ -151,24 +460,27 @@
               }
             },
             "relations": {
-              "posts": {
+              "files": {
                 "cardinality": "1:N",
                 "on": {
                   "localFields": [
                     "id"
                   ],
                   "targetFields": [
-                    "authorId"
+                    "ownerId"
                   ]
                 },
                 "to": {
-                  "model": "Post",
+                  "model": "File",
                   "namespace": "public"
                 }
               }
             },
             "storage": {
               "fields": {
+                "clerkId": {
+                  "column": "clerkId"
+                },
                 "createdAt": {
                   "column": "createdAt"
                 },
@@ -180,6 +492,9 @@
                 },
                 "name": {
                   "column": "name"
+                },
+                "role": {
+                  "column": "role"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
@@ -201,18 +516,80 @@
       "public": {
         "entries": {
           "table": {
-            "post": {
+            "download": {
               "columns": {
-                "authorId": {
+                "downloadedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
                   "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
                   "nativeType": "int4",
                   "nullable": false
                 },
-                "content": {
+                "ipAddress": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": true
                 },
+                "shareLinkId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "userAgent": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "shareLinkId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "download"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "shareLink"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "shareLinkId"
+                  ],
+                  "name": "download_shareLinkId_idx_373d21c1",
+                  "prefix": "download_shareLinkId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "file": {
+              "columns": {
                 "createdAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "default": {
@@ -231,7 +608,27 @@
                   "nativeType": "int4",
                   "nullable": false
                 },
-                "title": {
+                "mimeType": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "originalName": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "ownerId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "size": {
+                  "codecId": "pg/int8@1",
+                  "nativeType": "int8",
+                  "nullable": false
+                },
+                "storageKey": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": false
@@ -246,10 +643,10 @@
                 {
                   "source": {
                     "columns": [
-                      "authorId"
+                      "ownerId"
                     ],
                     "namespaceId": "public",
-                    "tableName": "post"
+                    "tableName": "file"
                   },
                   "target": {
                     "columns": [
@@ -263,10 +660,10 @@
               "indexes": [
                 {
                   "columns": [
-                    "authorId"
+                    "ownerId"
                   ],
-                  "name": "post_authorId_idx_e47547ed",
-                  "prefix": "post_authorId_idx",
+                  "name": "file_ownerId_idx_e2d0c1ef",
+                  "prefix": "file_ownerId_idx",
                   "unique": false
                 }
               ],
@@ -275,10 +672,148 @@
                   "id"
                 ]
               },
-              "uniques": []
+              "uniques": [
+                {
+                  "columns": [
+                    "storageKey"
+                  ]
+                }
+              ]
+            },
+            "shareLink": {
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "deleteAfterDownload": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "downloadCount": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "expiresAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "fileId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "maxDownloads": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "passwordHash": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "revoked": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "token": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "fileId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "shareLink"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "file"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "fileId"
+                  ],
+                  "name": "shareLink_fileId_idx_9a9e456b",
+                  "prefix": "shareLink_fileId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "token"
+                  ]
+                }
+              ]
             },
             "user": {
+              "checks": [
+                {
+                  "expression": "\"role\" IN ('USER', 'ADMIN')",
+                  "name": "user_role_check_1954e8c0",
+                  "prefix": "user_role_check"
+                }
+              ],
               "columns": {
+                "clerkId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
                 "createdAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "default": {
@@ -306,6 +841,21 @@
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": true
+                },
+                "role": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "USER"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "UserRole",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
                 },
                 "updatedAt": {
                   "codecId": "pg/timestamptz-string@1",
@@ -328,9 +878,23 @@
               "uniques": [
                 {
                   "columns": [
+                    "clerkId"
+                  ]
+                },
+                {
+                  "columns": [
                     "email"
                   ]
                 }
+              ]
+            }
+          },
+          "valueSet": {
+            "UserRole": {
+              "kind": "valueSet",
+              "values": [
+                "USER",
+                "ADMIN"
               ]
             }
           }
@@ -339,10 +903,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "1e8412e162dbbe69f4bb3bf8d07f0280ae67eaab15c34dcf201e67468315428d"
+    "storageHash": "8d47b99b34d37eb5a4e0cd11d002967ef2535e40ca71f9413fa759e9b05e818b"
   },
   "execution": {
-    "executionHash": "4abff323cc88151ef9c9a0ec90122cfee6d46814a118cdb66a9fdd94a4123463",
+    "executionHash": "da16c81142ce8c134854432eec09584a0605990037ba2e56b260c038ccd7b9f3",
     "mutations": {
       "defaults": [
         {
@@ -357,7 +921,22 @@
           "ref": {
             "column": "updatedAt",
             "namespace": "public",
-            "table": "post"
+            "table": "file"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "shareLink"
           }
         },
         {

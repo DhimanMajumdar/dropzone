@@ -2,20 +2,67 @@
 
 model User {
   id        Int      @id @default(autoincrement())
+  clerkId   String   @unique
   email     String   @unique
   username  String?
   name      String?
-  posts     Post[]
+  role      UserRole @default(USER)
+
+  files     File[]
+
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String?
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  Int
-  createdAt TimestamptzString @default(now())
-  updatedAt temporal.updatedAtString()
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model File {
+  id           Int      @id @default(autoincrement())
+  originalName String
+  storageKey   String   @unique
+  mimeType     String?
+  size         BigInt
+
+  owner        User     @relation(fields: [ownerId], references: [id])
+  ownerId      Int
+
+  shareLinks   ShareLink[]
+
+  createdAt    TimestamptzString @default(now())
+  updatedAt    temporal.updatedAtString()
+}
+
+model ShareLink {
+  id                  Int      @id @default(autoincrement())
+  token               String   @unique
+
+  file                File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  fileId              Int
+
+  expiresAt            TimestamptzString?
+  maxDownloads        Int?
+  downloadCount       Int      @default(0)
+
+  passwordHash        String?
+  deleteAfterDownload Boolean  @default(false)
+  revoked             Boolean  @default(false)
+
+  downloads            Download[]
+
+  createdAt             TimestamptzString @default(now())
+  updatedAt             temporal.updatedAtString()
+}
+
+model Download {
+  id           Int        @id @default(autoincrement())
+
+  shareLink    ShareLink  @relation(fields: [shareLinkId], references: [id], onDelete: Cascade)
+  shareLinkId  Int
+
+  ipAddress    String?
+  userAgent    String?
+  downloadedAt TimestamptzString @default(now())
 }
