@@ -165,4 +165,90 @@ app.post('/api/files', async (req, res) => {
     }
 });
 
+app.post('/api/share-links', async (req, res) => {
+    const { isAuthenticated, userId } = getAuth(req);
+
+    if (!isAuthenticated || !userId) {
+        return res.status(401).json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const {
+        fileId,
+        expiresAt,
+        maxDownloads,
+        passwordHash,
+        deleteAfterDownload,
+    } = req.body;
+
+    if (!fileId) {
+        return res.status(400).json({
+            error: 'fileId is required',
+        });
+    }
+
+    try {
+        // Find logged-in user
+        const user = await db.orm.public.User.first({
+            clerkId: userId,
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                error: 'User not found',
+            });
+        }
+
+        // Find file
+        const file = await db.orm.public.File.first({
+            id: Number(fileId),
+        });
+
+        if (!file) {
+            return res.status(404).json({
+                error: 'File not found',
+            });
+        }
+
+        // Ownership check
+        if (file.ownerId !== user.id) {
+            return res.status(403).json({
+                error: 'You do not own this file',
+            });
+        }
+
+        // Generate secure random token
+        const token = crypto.randomBytes(32).toString('hex');
+
+        // Create share link
+        const shareLink = await db.orm.public.ShareLink.create({
+            token,
+            fileId: file.id,
+            expiresAt: expiresAt || null,
+            maxDownloads: maxDownloads
+                ? Number(maxDownloads)
+                : null,
+            passwordHash: passwordHash || null,
+            deleteAfterDownload: Boolean(deleteAfterDownload),
+        });
+
+        return res.status(201).json({
+            id: shareLink.id,
+            token: shareLink.token,
+            fileId: shareLink.fileId,
+            expiresAt: shareLink.expiresAt,
+            maxDownloads: shareLink.maxDownloads,
+            deleteAfterDownload: shareLink.deleteAfterDownload,
+            shareUrl: `http://localhost:3000/share/${shareLink.token}`,
+        });
+    } catch (error) {
+        console.error('Failed to create share link:', error);
+
+        return res.status(500).json({
+            error: 'Failed to create share link',
+        });
+    }
+});
+
 export default app;

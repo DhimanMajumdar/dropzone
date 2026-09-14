@@ -7,8 +7,17 @@ import {
   useAuth,
 } from '@clerk/nextjs';
 
+import { useState } from 'react';
+
 export default function Home() {
   const { getToken } = useAuth();
+
+  const [uploadedFile, setUploadedFile] = useState<{
+    id: number;
+    originalName: string;
+  } | null>(null);
+
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
 
   const uploadFile = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -91,6 +100,15 @@ export default function Home() {
         return;
       }
 
+      // 5. Store uploaded file in state
+      setUploadedFile({
+        id: savedFile.id,
+        originalName: savedFile.originalName,
+      });
+
+      // Clear previous share link
+      setShareUrl(null);
+
       console.log('Uploaded successfully!');
       console.log('Storage key:', data.storageKey);
       console.log('Database file:', savedFile);
@@ -99,6 +117,53 @@ export default function Home() {
     } catch (error) {
       console.error('Upload error:', error);
       alert('Upload failed');
+    }
+  };
+
+  const createShareLink = async () => {
+    try {
+      const token = await getToken();
+
+      if (!token) {
+        alert('Please sign in first');
+        return;
+      }
+
+      if (!uploadedFile) {
+        alert('No file uploaded');
+        return;
+      }
+
+      const response = await fetch(
+        'http://localhost:5000/api/share-links',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            fileId: uploadedFile.id,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error(data);
+        alert('Failed to create share link');
+        return;
+      }
+
+      setShareUrl(data.shareUrl);
+
+      console.log('Share link:', data.shareUrl);
+
+      alert('Share link created successfully!');
+    } catch (error) {
+      console.error('Share link error:', error);
+      alert('Failed to create share link');
     }
   };
 
@@ -121,6 +186,29 @@ export default function Home() {
             onChange={uploadFile}
           />
         </div>
+
+        {uploadedFile && (
+          <div>
+            <p>
+              Uploaded: {uploadedFile.originalName}
+            </p>
+
+            <button onClick={createShareLink}>
+              Create Share Link
+            </button>
+
+            {shareUrl && (
+              <div>
+                <p>Share this link:</p>
+
+                <input
+                  value={shareUrl}
+                  readOnly
+                />
+              </div>
+            )}
+          </div>
+        )}
       </Show>
     </main>
   );
