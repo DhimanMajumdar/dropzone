@@ -4,6 +4,9 @@ import cors from 'cors';
 import { clerkClient, clerkMiddleware, getAuth } from '@clerk/express';
 import { db } from './prisma/db'
 
+import { createUploadUrl } from './services/s3.service';
+import crypto from 'crypto';
+
 const app = express();
 
 app.use(cors());
@@ -68,6 +71,96 @@ app.get('/api/me', async (req, res) => {
 
         return res.status(500).json({
             error: 'Failed to sync user',
+        });
+    }
+});
+
+app.post('/api/files/upload-url', async (req, res) => {
+    const { isAuthenticated, userId } = getAuth(req);
+
+    if (!isAuthenticated || !userId) {
+        return res.status(401).json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const { fileName, contentType } = req.body;
+
+    if (!fileName || !contentType) {
+        return res.status(400).json({
+            error: 'fileName and contentType are required',
+        });
+    }
+
+    try {
+        const storageKey = `files/${userId}/${crypto.randomUUID()}-${fileName}`;
+
+        const uploadUrl = await createUploadUrl(
+            storageKey,
+            contentType,
+        );
+
+        return res.json({
+            uploadUrl,
+            storageKey,
+        });
+    } catch (error) {
+        console.error('Failed to create upload URL:', error);
+
+        return res.status(500).json({
+            error: 'Failed to create upload URL',
+        });
+    }
+});
+
+app.post('/api/files', async (req, res) => {
+    const { isAuthenticated, userId } = getAuth(req);
+
+    if (!isAuthenticated || !userId) {
+        return res.status(401).json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const { originalName, storageKey, mimeType, size } = req.body;
+
+    if (!originalName || !storageKey || !size) {
+        return res.status(400).json({
+            error: 'originalName, storageKey and size are required',
+        });
+    }
+
+    try {
+        const user = await db.orm.public.User.first({
+            clerkId: userId,
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                error: 'User not found',
+            });
+        }
+
+        const file = await db.orm.public.File.create({
+            originalName,
+            storageKey,
+            mimeType: mimeType || null,
+            size: BigInt(size),
+            ownerId: user.id,
+        });
+
+        return res.status(201).json({
+            id: file.id,
+            originalName: file.originalName,
+            storageKey: file.storageKey,
+            mimeType: file.mimeType,
+            size: file.size.toString(),
+        });
+    } catch (error) {
+        console.error('Failed to save file:', error);
+
+        return res.status(500).json({
+            error: 'Failed to save file',
         });
     }
 });

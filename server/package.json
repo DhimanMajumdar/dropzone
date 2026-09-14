@@ -10,6 +10,8 @@
     "contract:emit": "prisma contract emit"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1131.0",
+    "@aws-sdk/s3-request-presigner": "^3.1131.0",
     "@clerk/express": "^2.1.67",
     "@prisma/orm-postgres": "^8.0.0-rc.11",
     "cors": "^2.8.6",
