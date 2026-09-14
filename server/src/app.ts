@@ -4,7 +4,7 @@ import cors from 'cors';
 import { clerkClient, clerkMiddleware, getAuth } from '@clerk/express';
 import { db } from './prisma/db'
 
-import { createUploadUrl } from './services/s3.service';
+import { createDownloadUrl, createUploadUrl } from './services/s3.service';
 import crypto from 'crypto';
 
 const app = express();
@@ -247,6 +247,86 @@ app.post('/api/share-links', async (req, res) => {
 
         return res.status(500).json({
             error: 'Failed to create share link',
+        });
+    }
+});
+
+app.get('/api/share-links/:token/download', async (req, res) => {
+    const { token } = req.params;
+
+    if (!token) {
+        return res.status(400).json({
+            error: 'Share token is required',
+        });
+    }
+
+    try {
+        // Find share link
+        const shareLink = await db.orm.public.ShareLink.first({
+            token,
+        });
+
+        if (!shareLink) {
+            return res.status(404).json({
+                error: 'Share link not found',
+            });
+        }
+
+        // Check if link is revoked
+        if (shareLink.revoked) {
+            return res.status(403).json({
+                error: 'Share link has been revoked',
+            });
+        }
+
+        // Check expiry
+        if (
+            shareLink.expiresAt &&
+            new Date(shareLink.expiresAt) <= new Date()
+        ) {
+            return res.status(410).json({
+                error: 'Share link has expired',
+            });
+        }
+
+        // Check download limit
+        if (
+            shareLink.maxDownloads !== null &&
+            shareLink.downloadCount >= shareLink.maxDownloads
+        ) {
+            return res.status(410).json({
+                error: 'Download limit reached',
+            });
+        }
+
+        // Find associated file
+        const file = await db.orm.public.File.first({
+            id: shareLink.fileId,
+        });
+
+        if (!file) {
+            return res.status(404).json({
+                error: 'File not found',
+            });
+        }
+
+        // Generate short-lived S3 download URL
+        const downloadUrl = await createDownloadUrl(
+            file.storageKey,
+        );
+
+        return res.json({
+            downloadUrl,
+            fileName: file.originalName,
+        });
+    } catch (error) {
+        console.error(
+            'Failed to create download URL:',
+            error,
+        );
+
+        return res.status(500).json({
+            error: 'Failed to create download URL',
         });
     }
 });
