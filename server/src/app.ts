@@ -7,6 +7,8 @@ import { db } from './prisma/db'
 import { createDownloadUrl, createUploadUrl } from './services/s3.service';
 import crypto from 'crypto';
 
+import { downloadRateLimiter } from './middleware/rateLimiter';
+
 import { fileCleanupQueue } from './queues/fileCleanup.queue';
 
 const app = express();
@@ -253,10 +255,10 @@ app.post('/api/share-links', async (req, res) => {
     }
 });
 
-app.get('/api/share-links/:token/download', async (req, res) => {
-    const { token } = req.params;
+app.get('/api/share-links/:token/download', downloadRateLimiter, async (req, res) => {
+    const token = req.params.token;
 
-    if (!token) {
+    if (!token || typeof token !== 'string') {
         return res.status(400).json({
             error: 'Share token is required',
         });
