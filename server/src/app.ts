@@ -5,6 +5,10 @@ import { clerkClient, clerkMiddleware, getAuth } from '@clerk/express';
 import { db } from './prisma/db'
 
 import dashboardRoutes from './routes/dashboard.routes';
+import shareLinksRoutes from './routes/share-links.routes';
+import filesRoutes from './routes/files.routes';
+
+
 
 import { createDownloadUrl, createUploadUrl } from './services/s3.service';
 import crypto from 'crypto';
@@ -26,7 +30,11 @@ app.get('/health', (_req, res) => {
     });
 });
 
+
+
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/share-links', shareLinksRoutes);
+app.use('/api/files', filesRoutes);
 
 app.get('/api/me', async (req, res) => {
     const { isAuthenticated, userId } = getAuth(req);

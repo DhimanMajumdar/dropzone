@@ -31,6 +31,8 @@ import {
   Filter,
   Sparkles,
   Link2,
+  Ban,
+  X,
 } from 'lucide-react';
 
 interface ShareLink {
@@ -171,6 +173,16 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'expired'>('all');
 
+  // Management State: Revoke Share Link
+  const [revokeConfirmLink, setRevokeConfirmLink] = useState<ShareLink | null>(null);
+  const [revokingLinkId, setRevokingLinkId] = useState<number | null>(null);
+  const [revokeError, setRevokeError] = useState<{ linkId: number; message: string } | null>(null);
+
+  // Management State: Delete File
+  const [deleteConfirmFile, setDeleteConfirmFile] = useState<FileItem | null>(null);
+  const [deletingFileId, setDeletingFileId] = useState<number | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
   const fetchDashboard = useCallback(
     async (isManualRefresh = false) => {
       try {
@@ -230,6 +242,133 @@ export default function DashboardPage() {
     }, 2000);
   };
 
+  // 1. Revoke Share Link API Call
+  const handleRevokeShareLink = async (shareLinkId: number) => {
+    try {
+      setRevokingLinkId(shareLinkId);
+      setRevokeError(null);
+
+      const token = await getToken();
+      if (!token) {
+        setRevokeError({
+          linkId: shareLinkId,
+          message: 'Authentication token unavailable. Please sign in again.',
+        });
+        return;
+      }
+
+      const res = await fetch(
+        `http://localhost:5000/api/share-links/${shareLinkId}/revoke`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(
+          data.error || 'Unable to revoke this share link. Please try again.',
+        );
+      }
+
+      // Success: update dashboard state immediately
+      setDashboardData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          files: prev.files.map((file) => ({
+            ...file,
+            shareLinks: file.shareLinks.map((sl) =>
+              sl.id === shareLinkId ? { ...sl, revoked: true } : sl,
+            ),
+          })),
+        };
+      });
+
+      setRevokeConfirmLink(null);
+    } catch (err: any) {
+      console.error('Revoke share link error:', err);
+      setRevokeError({
+        linkId: shareLinkId,
+        message:
+          err.message || 'Unable to revoke this share link. Please try again.',
+      });
+    } finally {
+      setRevokingLinkId(null);
+    }
+  };
+
+  // 2. Delete File API Call
+  const handleDeleteFile = async (fileId: number) => {
+    if (!deleteConfirmFile) return;
+    try {
+      setDeletingFileId(fileId);
+      setDeleteError(null);
+
+      const token = await getToken();
+      if (!token) {
+        setDeleteError(
+          'Authentication token unavailable. Please sign in again.',
+        );
+        return;
+      }
+
+      const res = await fetch(`http://localhost:5000/api/files/${fileId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(
+          data.error || 'Unable to delete this file. Please try again.',
+        );
+      }
+
+      // Success: calculate metrics update and remove file from dashboard state
+      const targetFile = deleteConfirmFile;
+      const linksCount = targetFile.shareLinks.length;
+      const downloadsCount = targetFile.shareLinks.reduce(
+        (sum, sl) => sum + sl.downloadCount,
+        0,
+      );
+
+      setDashboardData((prev) => {
+        if (!prev) return prev;
+        return {
+          stats: {
+            totalFiles: Math.max(0, prev.stats.totalFiles - 1),
+            totalShareLinks: Math.max(
+              0,
+              prev.stats.totalShareLinks - linksCount,
+            ),
+            totalDownloads: Math.max(
+              0,
+              prev.stats.totalDownloads - downloadsCount,
+            ),
+          },
+          files: prev.files.filter((f) => f.id !== fileId),
+        };
+      });
+
+      setDeleteConfirmFile(null);
+    } catch (err: any) {
+      console.error('Delete file error:', err);
+      setDeleteError(
+        err.message || 'Unable to delete this file. Please try again.',
+      );
+    } finally {
+      setDeletingFileId(null);
+    }
+  };
+
   const filteredFiles = useMemo(() => {
     if (!dashboardData) return [];
     return dashboardData.files.filter((file) => {
@@ -287,7 +426,7 @@ export default function DashboardPage() {
             </Show>
 
             <Show when="signed-in">
-              {/* Top Navigation Breadcrumb / Tagline */}
+              {/* Top Navigation Tagline */}
               <div className="flex items-center gap-2 mb-3 text-xs font-mono font-medium text-zinc-500">
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-zinc-200 shadow-2xs text-zinc-700">
                   <Sparkles className="w-3.5 h-3.5 text-[#4f46e5]" />
@@ -363,12 +502,9 @@ export default function DashboardPage() {
                 <div className="bg-rose-50/90 border border-rose-200/90 rounded-2xl p-6 text-center text-rose-900 mb-8 shadow-2xs backdrop-blur-xs">
                   <AlertCircle className="w-7 h-7 mx-auto mb-2 text-rose-600" />
                   <p className="text-sm font-semibold mb-1">{error}</p>
-                  <p className="text-xs text-rose-600 mb-4">
-                    Failed to sync with standard API server at localhost:5000
-                  </p>
                   <button
                     onClick={() => fetchDashboard(false)}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-600 text-white text-xs font-medium hover:bg-rose-700 transition-colors shadow-2xs cursor-pointer"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-600 text-white text-xs font-medium hover:bg-rose-700 transition-colors shadow-2xs cursor-pointer mt-2"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
                     Retry connection
@@ -567,14 +703,30 @@ export default function DashboardPage() {
                                     </div>
                                   </div>
 
-                                  <div className="flex items-center gap-2 text-xs font-mono text-zinc-500 bg-white px-3 py-1.5 rounded-lg border border-zinc-200/80 shrink-0 self-start sm:self-auto">
-                                    <Link2 className="w-3.5 h-3.5 text-[#4f46e5]" />
-                                    <span>
-                                      {file.shareLinks.length}{' '}
-                                      {file.shareLinks.length === 1
-                                        ? 'link'
-                                        : 'links'}
-                                    </span>
+                                  {/* File Management Actions */}
+                                  <div className="flex items-center gap-2.5 shrink-0 self-start sm:self-auto">
+                                    <div className="flex items-center gap-2 text-xs font-mono text-zinc-500 bg-white px-3 py-1.5 rounded-lg border border-zinc-200/80">
+                                      <Link2 className="w-3.5 h-3.5 text-[#4f46e5]" />
+                                      <span>
+                                        {file.shareLinks.length}{' '}
+                                        {file.shareLinks.length === 1
+                                          ? 'link'
+                                          : 'links'}
+                                      </span>
+                                    </div>
+
+                                    {/* 2. DELETE FILE BUTTON */}
+                                    <button
+                                      onClick={() => {
+                                        setDeleteConfirmFile(file);
+                                        setDeleteError(null);
+                                      }}
+                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/80 font-medium text-xs transition-all shadow-2xs cursor-pointer active:scale-[0.98]"
+                                      title="Delete file permanently"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                                      <span>Delete</span>
+                                    </button>
                                   </div>
                                 </div>
 
@@ -650,10 +802,20 @@ export default function DashboardPage() {
                                                   </strong>
                                                 </span>
                                               </div>
+
+                                              {/* Revoke Inline Error */}
+                                              {revokeError &&
+                                                revokeError.linkId ===
+                                                  shareLink.id && (
+                                                  <p className="text-xs text-rose-600 font-medium">
+                                                    {revokeError.message}
+                                                  </p>
+                                                )}
                                             </div>
 
-                                            {/* 5. Actions: Copy & Open */}
-                                            <div className="flex items-center gap-2 shrink-0 pt-2.5 md:pt-0 border-t md:border-t-0 border-zinc-200/80">
+                                            {/* SHARE LINK ACTIONS: [ Copy ] [ Open ] [ Revoke ] */}
+                                            <div className="flex items-center gap-2 shrink-0 pt-2.5 md:pt-0 border-t md:border-t-0 border-zinc-200/80 flex-wrap sm:flex-nowrap">
+                                              {/* Copy Button */}
                                               <button
                                                 onClick={() =>
                                                   handleCopyLink(shareLink.token)
@@ -677,6 +839,7 @@ export default function DashboardPage() {
                                                 )}
                                               </button>
 
+                                              {/* Open Button */}
                                               <a
                                                 href={`/share/${shareLink.token}`}
                                                 target="_blank"
@@ -687,6 +850,37 @@ export default function DashboardPage() {
                                                 <ExternalLink className="w-3.5 h-3.5 text-zinc-400" />
                                                 <span>Open</span>
                                               </a>
+
+                                              {/* 1. REVOKE BUTTON (only when revoked === false) */}
+                                              {!shareLink.revoked && (
+                                                <button
+                                                  onClick={() => {
+                                                    setRevokeConfirmLink(
+                                                      shareLink,
+                                                    );
+                                                    setRevokeError(null);
+                                                  }}
+                                                  disabled={
+                                                    revokingLinkId ===
+                                                    shareLink.id
+                                                  }
+                                                  className="flex-1 md:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-rose-200 text-rose-700 hover:bg-rose-50 hover:border-rose-300 font-medium transition-all shadow-2xs cursor-pointer text-xs disabled:opacity-50"
+                                                  title="Revoke Share Link"
+                                                >
+                                                  {revokingLinkId ===
+                                                  shareLink.id ? (
+                                                    <>
+                                                      <Loader2 className="w-3.5 h-3.5 text-rose-600 animate-spin" />
+                                                      <span>Revoking...</span>
+                                                    </>
+                                                  ) : (
+                                                    <>
+                                                      <Ban className="w-3.5 h-3.5 text-rose-600" />
+                                                      <span>Revoke</span>
+                                                    </>
+                                                  )}
+                                                </button>
+                                              )}
                                             </div>
                                           </div>
                                         );
@@ -707,6 +901,143 @@ export default function DashboardPage() {
           </main>
         </div>
       </div>
+
+      {/* CONFIRMATION MODAL: REVOKE SHARE LINK */}
+      {revokeConfirmLink && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl border border-zinc-200 shadow-xl max-w-md w-full p-6 text-left relative animate-in fade-in zoom-in-95 duration-150">
+            <button
+              onClick={() => {
+                if (!revokingLinkId) {
+                  setRevokeConfirmLink(null);
+                  setRevokeError(null);
+                }
+              }}
+              className="absolute top-4 right-4 p-1 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 mb-4">
+              <Ban className="w-6 h-6" />
+            </div>
+
+            <h3 className="text-lg font-bold text-zinc-900 tracking-tight mb-2">
+              Revoke this share link?
+            </h3>
+            <p className="text-sm text-zinc-500 mb-3 leading-relaxed">
+              Anyone using this link will no longer be able to download the file.
+            </p>
+
+            <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-2.5 font-mono text-xs text-zinc-700 truncate mb-6">
+              /share/{revokeConfirmLink.token}
+            </div>
+
+            {revokeError &&
+              revokeError.linkId === revokeConfirmLink.id && (
+                <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                  <span>{revokeError.message}</span>
+                </div>
+              )}
+
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => {
+                  if (!revokingLinkId) {
+                    setRevokeConfirmLink(null);
+                    setRevokeError(null);
+                  }
+                }}
+                disabled={!!revokingLinkId}
+                className="px-4 py-2.5 rounded-xl border border-zinc-200 text-zinc-700 hover:bg-zinc-100 font-medium text-xs transition-colors cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleRevokeShareLink(revokeConfirmLink.id)}
+                disabled={!!revokingLinkId}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs transition-colors shadow-2xs cursor-pointer disabled:opacity-60"
+              >
+                {revokingLinkId === revokeConfirmLink.id ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Revoking...</span>
+                  </>
+                ) : (
+                  <span>Revoke link</span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CONFIRMATION MODAL: DELETE FILE */}
+      {deleteConfirmFile && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl border border-zinc-200 shadow-xl max-w-md w-full p-6 text-left relative animate-in fade-in zoom-in-95 duration-150">
+            <button
+              onClick={() => {
+                if (!deletingFileId) {
+                  setDeleteConfirmFile(null);
+                  setDeleteError(null);
+                }
+              }}
+              className="absolute top-4 right-4 p-1 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 mb-4">
+              <Trash2 className="w-6 h-6" />
+            </div>
+
+            <h3 className="text-lg font-bold text-zinc-900 tracking-tight mb-2 truncate">
+              Delete &quot;{deleteConfirmFile.originalName}&quot;?
+            </h3>
+            <p className="text-sm text-zinc-500 mb-6 leading-relaxed">
+              This will permanently remove the file and all of its share links.
+            </p>
+
+            {deleteError && (
+              <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                <span>{deleteError}</span>
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => {
+                  if (!deletingFileId) {
+                    setDeleteConfirmFile(null);
+                    setDeleteError(null);
+                  }
+                }}
+                disabled={!!deletingFileId}
+                className="px-4 py-2.5 rounded-xl border border-zinc-200 text-zinc-700 hover:bg-zinc-100 font-medium text-xs transition-colors cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeleteFile(deleteConfirmFile.id)}
+                disabled={!!deletingFileId}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs transition-colors shadow-2xs cursor-pointer disabled:opacity-60"
+              >
+                {deletingFileId === deleteConfirmFile.id ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <span>Delete permanently</span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
