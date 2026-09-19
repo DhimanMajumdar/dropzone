@@ -1,56 +1,56 @@
 'use client';
 
-import { ShieldCheck, Lock, Key, Clock, UserCheck, Link2 } from 'lucide-react';
+import { ShieldCheck, Lock, Key, Clock, UserCheck, Link2, KeyRound } from 'lucide-react';
 
 export default function SecuritySection() {
   const securityFeatures = [
     {
-      title: 'Private S3 Storage',
-      description: 'Objects are stored in bucket architectures configured for strict private access.',
+      title: 'Private Vault Storage',
+      description: 'Objects are stored in isolated vault architectures configured for strict private access.',
       icon: Lock,
     },
     {
-      title: 'Presigned Upload URLs',
-      description: 'Files upload directly to object storage via authenticated short-lived presigned URLs.',
+      title: 'Direct Stream Transfer',
+      description: 'Files upload directly to encrypted storage via authenticated short-lived security tokens.',
       icon: Key,
     },
     {
-      title: 'Temporary Download URLs',
-      description: 'Downloads execute through signed URLs generated strictly on valid request.',
-      icon: Clock,
+      title: 'Custom Password Locks',
+      description: 'Set custom passcodes on any link to restrict file access strictly to authorized recipients.',
+      icon: KeyRound,
     },
     {
-      title: 'Authenticated File Ownership',
-      description: 'Clerk authentication strictly isolates file ownership and authorization records.',
+      title: 'Authenticated Workspace',
+      description: 'Strict user authentication isolates your file storage workspace from unauthorized access.',
       icon: UserCheck,
     },
     {
-      title: 'Share-link Validation',
-      description: 'Tokens are verified against revocation and invalidation flags prior to serving files.',
+      title: 'Share Link Revocation',
+      description: 'Instantly revoke active share links or enforce download limits whenever needed.',
       icon: Link2,
     },
     {
-      title: 'Expiration Controls',
-      description: 'Set download limits and time-based expiration parameters on generated share links.',
-      icon: ShieldCheck,
+      title: 'Automated Lifecycle Purge',
+      description: 'Background engines automatically purge expired payloads and revokes stale links.',
+      icon: Clock,
     },
   ];
 
   return (
-    <section id="security" className="py-16 md:py-24 bg-[#0a0a0c] text-white relative overflow-hidden dark-grid-pattern">
+    <section id="security" className="py-20 md:py-28 bg-[#09090b] text-white relative overflow-hidden dark-grid-pattern">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
-        <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-mono font-medium uppercase tracking-wider mb-4 border border-emerald-500/20">
+        <div className="text-center max-w-2xl mx-auto mb-14 sm:mb-18">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-mono font-medium uppercase tracking-wider mb-4 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Architecture & Security</span>
+            <span>ARCHITECTURE & SECURITY</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight">
             Your files stay private.
           </h2>
 
-          <p className="text-zinc-400 text-sm sm:text-base leading-relaxed">
-            DropZone keeps files private in storage and only provides temporary access when a valid share link is used.
+          <p className="text-zinc-400 text-base leading-relaxed">
+            DropZone keeps files private in object storage and only provides temporary access when a valid share link is authorized.
           </p>
         </div>
 
@@ -60,12 +60,12 @@ export default function SecuritySection() {
             return (
               <div
                 key={item.title}
-                className="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 sm:p-6 hover:border-zinc-700 transition-colors shadow-lg"
+                className="bg-[#121215] border border-zinc-800/90 rounded-2xl p-6 hover:border-zinc-700 transition-all shadow-2xl"
               >
-                <div className="w-10 h-10 rounded-xl bg-zinc-800 text-indigo-400 flex items-center justify-center mb-4 border border-zinc-700">
+                <div className="w-10 h-10 rounded-xl bg-zinc-900 text-indigo-400 flex items-center justify-center mb-4 border border-zinc-800 shadow-2xs">
                   <Icon className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-bold text-zinc-100 mb-2">
+                <h3 className="text-base font-bold text-white mb-2 tracking-tight">
                   {item.title}
                 </h3>
                 <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">

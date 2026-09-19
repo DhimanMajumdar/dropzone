@@ -132,7 +132,7 @@ function getShareLinkStatus(shareLink: ShareLink): {
   if (shareLink.revoked) {
     return {
       label: 'Revoked',
-      badgeStyle: 'bg-rose-50 text-rose-700 border-rose-200/80',
+      badgeStyle: 'bg-rose-950/60 text-rose-300 border-rose-800/60',
       dotColor: 'bg-rose-500',
     };
   }
@@ -140,7 +140,7 @@ function getShareLinkStatus(shareLink: ShareLink): {
   if (shareLink.expiresAt && new Date(shareLink.expiresAt) <= new Date()) {
     return {
       label: 'Expired',
-      badgeStyle: 'bg-amber-50 text-amber-700 border-amber-200/80',
+      badgeStyle: 'bg-amber-950/60 text-amber-300 border-amber-800/60',
       dotColor: 'bg-amber-500',
     };
   }
@@ -151,15 +151,15 @@ function getShareLinkStatus(shareLink: ShareLink): {
   ) {
     return {
       label: 'Limit reached',
-      badgeStyle: 'bg-zinc-100 text-zinc-700 border-zinc-200',
+      badgeStyle: 'bg-zinc-800/80 text-zinc-300 border-zinc-700/80',
       dotColor: 'bg-zinc-400',
     };
   }
 
   return {
     label: 'Active',
-    badgeStyle: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
-    dotColor: 'bg-emerald-500',
+    badgeStyle: 'bg-emerald-950/60 text-emerald-300 border-emerald-800/60',
+    dotColor: 'bg-emerald-400',
   };
 }
 
@@ -398,27 +398,27 @@ export default function DashboardPage() {
   }, [dashboardData, searchQuery, filterStatus]);
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-[#fafafa] selection:bg-[#4f46e5] selection:text-white">
+    <div className="min-h-screen flex flex-col justify-between bg-[#09090b] text-[#f4f4f5] selection:bg-[#6366f1] selection:text-white">
       <div>
         <Navbar />
 
         {/* Workspace Canvas Background Pattern */}
-        <div className="bg-grid-pattern border-b border-zinc-200/60 bg-white/40">
+        <div className="bg-grid-pattern border-b border-zinc-800/80 bg-[#09090b]">
           <main className="py-8 sm:py-12 px-4 sm:px-6 max-w-6xl mx-auto w-full">
             <Show when="signed-out">
-              <div className="bg-white rounded-2xl border border-zinc-200/90 p-8 sm:p-12 text-center max-w-md mx-auto shadow-sm my-12 backdrop-blur-sm">
-                <div className="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mx-auto mb-5 text-[#4f46e5] shadow-2xs">
+              <div className="bg-[#121215] rounded-2xl border border-zinc-800 p-8 sm:p-12 text-center max-w-md mx-auto shadow-2xl my-12 backdrop-blur-sm">
+                <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-5 text-indigo-400 shadow-2xs">
                   <ShieldCheck className="w-7 h-7" />
                 </div>
-                <h2 className="text-xl font-bold text-zinc-900 mb-2 tracking-tight">
+                <h2 className="text-xl font-bold text-white mb-2 tracking-tight">
                   Authentication Required
                 </h2>
-                <p className="text-sm text-zinc-500 mb-6 leading-relaxed">
+                <p className="text-sm text-zinc-400 mb-6 leading-relaxed">
                   Please sign in to access your secure DropZone file workspace.
                 </p>
                 <Link
                   href="/"
-                  className="inline-flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl bg-[#4f46e5] hover:bg-indigo-700 text-white font-medium text-sm transition-all shadow-xs"
+                  className="inline-flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-medium text-sm transition-all shadow-[0_0_15px_rgba(99,102,241,0.25)]"
                 >
                   Return to Home
                 </Link>
@@ -427,13 +427,13 @@ export default function DashboardPage() {
 
             <Show when="signed-in">
               {/* Top Navigation Tagline */}
-              <div className="flex items-center gap-2 mb-3 text-xs font-mono font-medium text-zinc-500">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-zinc-200 shadow-2xs text-zinc-700">
-                  <Sparkles className="w-3.5 h-3.5 text-[#4f46e5]" />
+              <div className="flex items-center gap-2 mb-3 text-xs font-mono font-medium text-zinc-400">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#121215] border border-zinc-800 shadow-2xs text-zinc-300">
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
                   DASHBOARD OVERVIEW
                 </span>
-                <span className="text-zinc-300">•</span>
-                <span className="hidden sm:inline text-zinc-400">
+                <span className="text-zinc-700">•</span>
+                <span className="hidden sm:inline text-zinc-500">
                   PRIVATE STORAGE TRANSIT LAYER
                 </span>
               </div>
@@ -441,10 +441,10 @@ export default function DashboardPage() {
               {/* 1. Dashboard Header */}
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight flex items-center gap-3">
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
                     Your files
                   </h1>
-                  <p className="text-sm text-zinc-500 mt-1 font-normal">
+                  <p className="text-sm text-zinc-400 mt-1 font-normal">
                     Manage your files and shared links.
                   </p>
                 </div>
@@ -453,19 +453,19 @@ export default function DashboardPage() {
                   <button
                     onClick={() => fetchDashboard(true)}
                     disabled={refreshing || loading}
-                    className="inline-flex items-center justify-center p-2.5 rounded-xl bg-white border border-zinc-200/90 hover:bg-zinc-50 text-zinc-700 font-medium text-sm transition-all shadow-2xs hover:border-zinc-300 disabled:opacity-50 cursor-pointer"
+                    className="inline-flex items-center justify-center p-2.5 rounded-xl bg-[#121215] border border-zinc-800 hover:bg-zinc-800 text-zinc-300 hover:text-white font-medium text-sm transition-all shadow-2xs disabled:opacity-50 cursor-pointer"
                     title="Refresh Dashboard Data"
                   >
                     <RefreshCw
-                      className={`w-4 h-4 text-zinc-500 ${
-                        refreshing ? 'animate-spin text-[#4f46e5]' : ''
+                      className={`w-4 h-4 text-zinc-400 ${
+                        refreshing ? 'animate-spin text-indigo-400' : ''
                       }`}
                     />
                   </button>
 
                   <Link
                     href="/"
-                    className="inline-flex items-center justify-center gap-2 px-4.5 py-2.5 rounded-xl bg-[#4f46e5] hover:bg-indigo-700 text-white font-medium text-sm transition-all shadow-xs hover:shadow-sm cursor-pointer active:scale-[0.99]"
+                    className="inline-flex items-center justify-center gap-2 px-4.5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-medium text-sm transition-all shadow-[0_0_15px_rgba(99,102,241,0.25)] cursor-pointer active:scale-[0.99]"
                   >
                     <Plus className="w-4 h-4" />
                     Upload file
@@ -480,17 +480,17 @@ export default function DashboardPage() {
                     {[1, 2, 3].map((i) => (
                       <div
                         key={i}
-                        className="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-2xs animate-pulse"
+                        className="bg-[#121215] border border-zinc-800/90 rounded-2xl p-5 shadow-2xs animate-pulse"
                       >
-                        <div className="h-4 w-20 bg-zinc-100 rounded mb-4" />
-                        <div className="h-8 w-16 bg-zinc-200 rounded" />
+                        <div className="h-4 w-20 bg-zinc-800 rounded mb-4" />
+                        <div className="h-8 w-16 bg-zinc-700 rounded" />
                       </div>
                     ))}
                   </div>
 
-                  <div className="bg-white border border-zinc-200/80 rounded-2xl p-8 text-center shadow-2xs animate-pulse">
-                    <Loader2 className="w-6 h-6 text-[#4f46e5] animate-spin mx-auto mb-3" />
-                    <p className="text-sm text-zinc-500 font-medium">
+                  <div className="bg-[#121215] border border-zinc-800/90 rounded-2xl p-8 text-center shadow-2xs animate-pulse">
+                    <Loader2 className="w-6 h-6 text-indigo-400 animate-spin mx-auto mb-3" />
+                    <p className="text-sm text-zinc-400 font-medium">
                       Fetching encrypted file index...
                     </p>
                   </div>
@@ -499,12 +499,12 @@ export default function DashboardPage() {
 
               {/* Error State */}
               {!loading && error && (
-                <div className="bg-rose-50/90 border border-rose-200/90 rounded-2xl p-6 text-center text-rose-900 mb-8 shadow-2xs backdrop-blur-xs">
-                  <AlertCircle className="w-7 h-7 mx-auto mb-2 text-rose-600" />
+                <div className="bg-rose-950/60 border border-rose-800/60 rounded-2xl p-6 text-center text-rose-200 mb-8 shadow-2xs">
+                  <AlertCircle className="w-7 h-7 mx-auto mb-2 text-rose-400" />
                   <p className="text-sm font-semibold mb-1">{error}</p>
                   <button
                     onClick={() => fetchDashboard(false)}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-600 text-white text-xs font-medium hover:bg-rose-700 transition-colors shadow-2xs cursor-pointer mt-2"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-600 text-white text-xs font-medium hover:bg-rose-500 transition-colors shadow-2xs cursor-pointer mt-2"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
                     Retry connection
@@ -518,60 +518,60 @@ export default function DashboardPage() {
                   {/* 2. STAT CARDS */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                     {/* Files Stat */}
-                    <div className="bg-white border border-zinc-200/90 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:border-zinc-300 transition-all">
+                    <div className="bg-[#121215] border border-zinc-800/90 rounded-2xl p-5 shadow-2xl hover:border-zinc-700 transition-all">
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider font-mono">
                           Files
                         </span>
-                        <div className="w-9 h-9 rounded-xl bg-indigo-50/80 border border-indigo-100 flex items-center justify-center text-[#4f46e5] shadow-2xs">
+                        <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-2xs">
                           <Files className="w-4.5 h-4.5" />
                         </div>
                       </div>
                       <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-extrabold text-zinc-900 tracking-tight font-mono">
+                        <span className="text-3xl font-extrabold text-white tracking-tight font-mono">
                           {dashboardData.stats.totalFiles}
                         </span>
-                        <span className="text-xs text-zinc-400 font-medium">
+                        <span className="text-xs text-zinc-500 font-medium">
                           stored
                         </span>
                       </div>
                     </div>
 
                     {/* Share Links Stat */}
-                    <div className="bg-white border border-zinc-200/90 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:border-zinc-300 transition-all">
+                    <div className="bg-[#121215] border border-zinc-800/90 rounded-2xl p-5 shadow-2xl hover:border-zinc-700 transition-all">
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider font-mono">
                           Share links
                         </span>
-                        <div className="w-9 h-9 rounded-xl bg-indigo-50/80 border border-indigo-100 flex items-center justify-center text-[#4f46e5] shadow-2xs">
+                        <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-2xs">
                           <Share2 className="w-4.5 h-4.5" />
                         </div>
                       </div>
                       <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-extrabold text-zinc-900 tracking-tight font-mono">
+                        <span className="text-3xl font-extrabold text-white tracking-tight font-mono">
                           {dashboardData.stats.totalShareLinks}
                         </span>
-                        <span className="text-xs text-zinc-400 font-medium">
+                        <span className="text-xs text-zinc-500 font-medium">
                           generated
                         </span>
                       </div>
                     </div>
 
                     {/* Downloads Stat */}
-                    <div className="bg-white border border-zinc-200/90 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:border-zinc-300 transition-all">
+                    <div className="bg-[#121215] border border-zinc-800/90 rounded-2xl p-5 shadow-2xl hover:border-zinc-700 transition-all">
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider font-mono">
                           Downloads
                         </span>
-                        <div className="w-9 h-9 rounded-xl bg-indigo-50/80 border border-indigo-100 flex items-center justify-center text-[#4f46e5] shadow-2xs">
+                        <div className="w-9 h-9 rounded-xl bg-indigo-50/80 border border-indigo-100 flex items-center justify-center text-indigo-400 shadow-2xs bg-indigo-500/10 border-indigo-500/20">
                           <Download className="w-4.5 h-4.5" />
                         </div>
                       </div>
                       <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-extrabold text-zinc-900 tracking-tight font-mono">
+                        <span className="text-3xl font-extrabold text-white tracking-tight font-mono">
                           {dashboardData.stats.totalDownloads}
                         </span>
-                        <span className="text-xs text-zinc-400 font-medium">
+                        <span className="text-xs text-zinc-500 font-medium">
                           transits
                         </span>
                       </div>
@@ -580,19 +580,19 @@ export default function DashboardPage() {
 
                   {/* 6. EMPTY STATE */}
                   {dashboardData.files.length === 0 ? (
-                    <div className="bg-white border border-zinc-200/90 rounded-2xl p-12 sm:p-16 text-center shadow-xs">
-                      <div className="w-14 h-14 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center justify-center mx-auto mb-4 text-zinc-400 shadow-2xs">
+                    <div className="bg-[#121215] border border-zinc-800/90 rounded-2xl p-12 sm:p-16 text-center shadow-2xl">
+                      <div className="w-14 h-14 rounded-2xl bg-[#09090b] border border-zinc-800 flex items-center justify-center mx-auto mb-4 text-zinc-500 shadow-2xs">
                         <UploadCloud className="w-7 h-7 text-zinc-400" />
                       </div>
-                      <h3 className="text-lg font-bold text-zinc-900 mb-1 tracking-tight">
+                      <h3 className="text-lg font-bold text-white mb-1 tracking-tight">
                         No files yet
                       </h3>
-                      <p className="text-sm text-zinc-500 mb-6 max-w-sm mx-auto leading-relaxed">
+                      <p className="text-sm text-zinc-400 mb-6 max-w-sm mx-auto leading-relaxed">
                         Upload your first file to get started.
                       </p>
                       <Link
                         href="/"
-                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#4f46e5] hover:bg-indigo-700 text-white font-medium text-sm transition-all shadow-xs cursor-pointer active:scale-[0.99]"
+                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-medium text-sm transition-all shadow-xs cursor-pointer active:scale-[0.99]"
                       >
                         <Plus className="w-4 h-4" />
                         Upload file
@@ -602,25 +602,25 @@ export default function DashboardPage() {
                     /* 3. FILE LIST & TOOLBAR */
                     <div className="space-y-5">
                       {/* Search and Filter Controls */}
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-zinc-200/90 shadow-2xs">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#121215] p-3.5 rounded-2xl border border-zinc-800/90 shadow-2xs">
                         <div className="relative flex-1">
-                          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" />
+                          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
                           <input
                             type="text"
                             placeholder="Filter files by filename..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-9 pr-3.5 py-1.5 text-xs sm:text-sm bg-zinc-50 border border-zinc-200/80 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus:outline-hidden focus:border-[#4f46e5] focus:bg-white transition-all"
+                            className="w-full pl-9 pr-3.5 py-1.5 text-xs sm:text-sm bg-[#09090b] border border-zinc-800 rounded-xl text-white placeholder:text-zinc-500 focus:outline-hidden focus:border-indigo-500 transition-all font-sans"
                           />
                         </div>
 
-                        <div className="flex items-center gap-1 bg-zinc-100/80 p-1 rounded-xl border border-zinc-200/60 self-start sm:self-auto text-xs font-medium">
+                        <div className="flex items-center gap-1 bg-[#09090b] p-1 rounded-xl border border-zinc-800 self-start sm:self-auto text-xs font-medium">
                           <button
                             onClick={() => setFilterStatus('all')}
                             className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
                               filterStatus === 'all'
-                                ? 'bg-white text-zinc-900 shadow-2xs font-semibold'
-                                : 'text-zinc-600 hover:text-zinc-900'
+                                ? 'bg-zinc-800 text-white shadow-2xs font-semibold'
+                                : 'text-zinc-400 hover:text-white'
                             }`}
                           >
                             All ({dashboardData.files.length})
@@ -629,8 +629,8 @@ export default function DashboardPage() {
                             onClick={() => setFilterStatus('active')}
                             className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
                               filterStatus === 'active'
-                                ? 'bg-white text-zinc-900 shadow-2xs font-semibold'
-                                : 'text-zinc-600 hover:text-zinc-900'
+                                ? 'bg-zinc-800 text-white shadow-2xs font-semibold'
+                                : 'text-zinc-400 hover:text-white'
                             }`}
                           >
                             Active Links
@@ -639,8 +639,8 @@ export default function DashboardPage() {
                             onClick={() => setFilterStatus('expired')}
                             className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
                               filterStatus === 'expired'
-                                ? 'bg-white text-zinc-900 shadow-2xs font-semibold'
-                                : 'text-zinc-600 hover:text-zinc-900'
+                                ? 'bg-zinc-800 text-white shadow-2xs font-semibold'
+                                : 'text-zinc-400 hover:text-white'
                             }`}
                           >
                             Expired / Revoked
@@ -650,9 +650,9 @@ export default function DashboardPage() {
 
                       {/* Filtered Empty Match */}
                       {filteredFiles.length === 0 ? (
-                        <div className="bg-white border border-zinc-200/90 rounded-2xl p-10 text-center shadow-xs">
-                          <Filter className="w-6 h-6 text-zinc-400 mx-auto mb-2" />
-                          <p className="text-sm font-semibold text-zinc-800">
+                        <div className="bg-[#121215] border border-zinc-800/90 rounded-2xl p-10 text-center shadow-2xs">
+                          <Filter className="w-6 h-6 text-zinc-500 mx-auto mb-2" />
+                          <p className="text-sm font-semibold text-zinc-300">
                             No files match your search criteria.
                           </p>
                           <button
@@ -660,7 +660,7 @@ export default function DashboardPage() {
                               setSearchQuery('');
                               setFilterStatus('all');
                             }}
-                            className="mt-3 text-xs font-medium text-[#4f46e5] hover:underline cursor-pointer"
+                            className="mt-3 text-xs font-medium text-indigo-400 hover:underline cursor-pointer"
                           >
                             Reset filters
                           </button>
@@ -676,23 +676,23 @@ export default function DashboardPage() {
                             return (
                               <div
                                 key={file.id}
-                                className="bg-white border border-zinc-200/90 rounded-2xl overflow-hidden shadow-2xs hover:border-zinc-300 transition-all"
+                                className="bg-[#121215] border border-zinc-800/90 rounded-2xl overflow-hidden shadow-2xl hover:border-zinc-700 transition-all"
                               >
                                 {/* File Header Row */}
-                                <div className="p-4 sm:p-5 border-b border-zinc-100 bg-zinc-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div className="p-4 sm:p-5 border-b border-zinc-800/80 bg-[#09090b]/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                   <div className="flex items-center gap-3.5 min-w-0">
-                                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-50 to-indigo-100/60 border border-indigo-100 text-[#4f46e5] flex items-center justify-center shrink-0 shadow-2xs">
+                                    <div className="w-11 h-11 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 shadow-2xs">
                                       <Icon className="w-5.5 h-5.5" />
                                     </div>
                                     <div className="min-w-0">
                                       <h3
-                                        className="font-bold text-zinc-900 text-sm sm:text-base truncate tracking-tight"
+                                        className="font-bold text-white text-sm sm:text-base truncate tracking-tight"
                                         title={file.originalName}
                                       >
                                         {file.originalName}
                                       </h3>
-                                      <div className="flex items-center gap-2 mt-0.5 text-xs text-zinc-500 font-mono flex-wrap">
-                                        <span className="font-semibold text-zinc-700 bg-white px-2 py-0.5 rounded border border-zinc-200/80">
+                                      <div className="flex items-center gap-2 mt-0.5 text-xs text-zinc-400 font-mono flex-wrap">
+                                        <span className="font-semibold text-zinc-300 bg-[#121215] px-2 py-0.5 rounded border border-zinc-800">
                                           {formatBytes(file.size)}
                                         </span>
                                         <span>•</span>
@@ -705,8 +705,8 @@ export default function DashboardPage() {
 
                                   {/* File Management Actions */}
                                   <div className="flex items-center gap-2.5 shrink-0 self-start sm:self-auto">
-                                    <div className="flex items-center gap-2 text-xs font-mono text-zinc-500 bg-white px-3 py-1.5 rounded-lg border border-zinc-200/80">
-                                      <Link2 className="w-3.5 h-3.5 text-[#4f46e5]" />
+                                    <div className="flex items-center gap-2 text-xs font-mono text-zinc-400 bg-[#09090b] px-3 py-1.5 rounded-lg border border-zinc-800">
+                                      <Link2 className="w-3.5 h-3.5 text-indigo-400" />
                                       <span>
                                         {file.shareLinks.length}{' '}
                                         {file.shareLinks.length === 1
@@ -721,10 +721,10 @@ export default function DashboardPage() {
                                         setDeleteConfirmFile(file);
                                         setDeleteError(null);
                                       }}
-                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/80 font-medium text-xs transition-all shadow-2xs cursor-pointer active:scale-[0.98]"
+                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border border-rose-800/60 font-medium text-xs transition-all shadow-2xs cursor-pointer active:scale-[0.98]"
                                       title="Delete file permanently"
                                     >
-                                      <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                                      <Trash2 className="w-3.5 h-3.5 text-rose-400" />
                                       <span>Delete</span>
                                     </button>
                                   </div>
@@ -733,7 +733,7 @@ export default function DashboardPage() {
                                 {/* 4. Share Links inside File */}
                                 <div className="p-4 sm:p-5">
                                   {file.shareLinks.length === 0 ? (
-                                    <p className="text-xs text-zinc-400 italic">
+                                    <p className="text-xs text-zinc-500 italic">
                                       No share links generated for this file.
                                     </p>
                                   ) : (
@@ -746,7 +746,7 @@ export default function DashboardPage() {
                                         return (
                                           <div
                                             key={shareLink.id}
-                                            className="bg-zinc-50/70 border border-zinc-200/70 rounded-xl p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs transition-all hover:bg-white hover:border-zinc-300/80 hover:shadow-2xs"
+                                            className="bg-[#09090b]/80 border border-zinc-800/80 rounded-xl p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs transition-all hover:bg-[#121215] hover:border-zinc-700/90 shadow-2xs"
                                           >
                                             {/* Details & Badges */}
                                             <div className="flex-1 min-w-0 space-y-2">
@@ -762,8 +762,8 @@ export default function DashboardPage() {
                                                 </span>
 
                                                 {shareLink.deleteAfterDownload && (
-                                                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-medium bg-purple-50 text-purple-700 border border-purple-200/80 font-mono">
-                                                    <Trash2 className="w-3 h-3 text-purple-600" />
+                                                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-medium bg-purple-950/60 text-purple-300 border border-purple-800/60 font-mono">
+                                                    <Trash2 className="w-3 h-3 text-purple-400" />
                                                     Delete after download
                                                   </span>
                                                 )}
@@ -771,17 +771,17 @@ export default function DashboardPage() {
 
                                               {/* Token Box */}
                                               <div className="flex items-center gap-2 min-w-0">
-                                                <code className="font-mono text-zinc-800 bg-white px-2.5 py-1 rounded-lg border border-zinc-200/90 truncate max-w-full sm:max-w-md text-xs shadow-2xs">
+                                                <code className="font-mono text-indigo-300 bg-[#121215] px-2.5 py-1 rounded-lg border border-zinc-800 truncate max-w-full sm:max-w-md text-xs shadow-2xs">
                                                   {displayUrl}
                                                 </code>
                                               </div>
 
                                               {/* Metrics: Downloads & Expiry */}
-                                              <div className="flex items-center gap-4 text-zinc-500 text-[11px] font-mono flex-wrap">
-                                                <span className="flex items-center gap-1.5 bg-white/80 px-2 py-0.5 rounded border border-zinc-200/60">
-                                                  <Download className="w-3.5 h-3.5 text-zinc-400" />
+                                              <div className="flex items-center gap-4 text-zinc-400 text-[11px] font-mono flex-wrap">
+                                                <span className="flex items-center gap-1.5 bg-[#121215] px-2 py-0.5 rounded border border-zinc-800">
+                                                  <Download className="w-3.5 h-3.5 text-zinc-500" />
                                                   <span>Downloads:</span>
-                                                  <strong className="text-zinc-800">
+                                                  <strong className="text-zinc-200">
                                                     {shareLink.downloadCount} /{' '}
                                                     {shareLink.maxDownloads !==
                                                     null
@@ -790,10 +790,10 @@ export default function DashboardPage() {
                                                   </strong>
                                                 </span>
 
-                                                <span className="flex items-center gap-1.5 bg-white/80 px-2 py-0.5 rounded border border-zinc-200/60">
-                                                  <Clock className="w-3.5 h-3.5 text-zinc-400" />
+                                                <span className="flex items-center gap-1.5 bg-[#121215] px-2 py-0.5 rounded border border-zinc-800">
+                                                  <Clock className="w-3.5 h-3.5 text-zinc-500" />
                                                   <span>Expiry:</span>
-                                                  <strong className="text-zinc-800">
+                                                  <strong className="text-zinc-200">
                                                     {shareLink.expiresAt
                                                       ? formatDate(
                                                           shareLink.expiresAt,
@@ -807,33 +807,33 @@ export default function DashboardPage() {
                                               {revokeError &&
                                                 revokeError.linkId ===
                                                   shareLink.id && (
-                                                  <p className="text-xs text-rose-600 font-medium">
+                                                  <p className="text-xs text-rose-400 font-medium">
                                                     {revokeError.message}
                                                   </p>
                                                 )}
                                             </div>
 
                                             {/* SHARE LINK ACTIONS: [ Copy ] [ Open ] [ Revoke ] */}
-                                            <div className="flex items-center gap-2 shrink-0 pt-2.5 md:pt-0 border-t md:border-t-0 border-zinc-200/80 flex-wrap sm:flex-nowrap">
+                                            <div className="flex items-center gap-2 shrink-0 pt-2.5 md:pt-0 border-t md:border-t-0 border-zinc-800/80 flex-wrap sm:flex-nowrap">
                                               {/* Copy Button */}
                                               <button
                                                 onClick={() =>
                                                   handleCopyLink(shareLink.token)
                                                 }
-                                                className="flex-1 md:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 font-medium transition-all shadow-2xs hover:border-zinc-300 cursor-pointer text-xs"
+                                                className="flex-1 md:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#121215] border border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white font-medium transition-all shadow-2xs cursor-pointer text-xs"
                                                 title="Copy Share Link"
                                               >
                                                 {copiedToken ===
                                                 shareLink.token ? (
                                                   <>
-                                                    <Check className="w-3.5 h-3.5 text-emerald-600" />
-                                                    <span className="text-emerald-700 font-semibold">
+                                                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                                    <span className="text-emerald-400 font-semibold">
                                                       Copied
                                                     </span>
                                                   </>
                                                 ) : (
                                                   <>
-                                                    <Copy className="w-3.5 h-3.5 text-zinc-400" />
+                                                    <Copy className="w-3.5 h-3.5 text-zinc-500" />
                                                     <span>Copy</span>
                                                   </>
                                                 )}
@@ -844,10 +844,10 @@ export default function DashboardPage() {
                                                 href={`/share/${shareLink.token}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="flex-1 md:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 font-medium transition-all shadow-2xs hover:border-zinc-300 cursor-pointer text-xs"
+                                                className="flex-1 md:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#121215] border border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white font-medium transition-all shadow-2xs cursor-pointer text-xs"
                                                 title="Open Share Link in new tab"
                                               >
-                                                <ExternalLink className="w-3.5 h-3.5 text-zinc-400" />
+                                                <ExternalLink className="w-3.5 h-3.5 text-zinc-500" />
                                                 <span>Open</span>
                                               </a>
 
@@ -864,18 +864,18 @@ export default function DashboardPage() {
                                                     revokingLinkId ===
                                                     shareLink.id
                                                   }
-                                                  className="flex-1 md:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-rose-200 text-rose-700 hover:bg-rose-50 hover:border-rose-300 font-medium transition-all shadow-2xs cursor-pointer text-xs disabled:opacity-50"
+                                                  className="flex-1 md:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-rose-950/40 border border-rose-800/60 text-rose-300 hover:bg-rose-900/60 hover:text-rose-100 font-medium transition-all shadow-2xs cursor-pointer text-xs disabled:opacity-50"
                                                   title="Revoke Share Link"
                                                 >
                                                   {revokingLinkId ===
                                                   shareLink.id ? (
                                                     <>
-                                                      <Loader2 className="w-3.5 h-3.5 text-rose-600 animate-spin" />
+                                                      <Loader2 className="w-3.5 h-3.5 text-rose-400 animate-spin" />
                                                       <span>Revoking...</span>
                                                     </>
                                                   ) : (
                                                     <>
-                                                      <Ban className="w-3.5 h-3.5 text-rose-600" />
+                                                      <Ban className="w-3.5 h-3.5 text-rose-400" />
                                                       <span>Revoke</span>
                                                     </>
                                                   )}
@@ -904,8 +904,8 @@ export default function DashboardPage() {
 
       {/* CONFIRMATION MODAL: REVOKE SHARE LINK */}
       {revokeConfirmLink && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl border border-zinc-200 shadow-xl max-w-md w-full p-6 text-left relative animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
+          <div className="bg-[#121215] rounded-2xl border border-zinc-800 shadow-2xl max-w-md w-full p-6 text-left relative animate-in fade-in zoom-in-95 duration-150">
             <button
               onClick={() => {
                 if (!revokingLinkId) {
@@ -913,30 +913,30 @@ export default function DashboardPage() {
                   setRevokeError(null);
                 }
               }}
-              className="absolute top-4 right-4 p-1 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
+              className="absolute top-4 right-4 p-1 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
 
-            <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-amber-950/60 border border-amber-800/60 flex items-center justify-center text-amber-400 mb-4">
               <Ban className="w-6 h-6" />
             </div>
 
-            <h3 className="text-lg font-bold text-zinc-900 tracking-tight mb-2">
+            <h3 className="text-lg font-bold text-white tracking-tight mb-2">
               Revoke this share link?
             </h3>
-            <p className="text-sm text-zinc-500 mb-3 leading-relaxed">
+            <p className="text-sm text-zinc-400 mb-3 leading-relaxed">
               Anyone using this link will no longer be able to download the file.
             </p>
 
-            <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-2.5 font-mono text-xs text-zinc-700 truncate mb-6">
+            <div className="bg-[#09090b] border border-zinc-800 rounded-lg p-2.5 font-mono text-xs text-indigo-300 truncate mb-6">
               /share/{revokeConfirmLink.token}
             </div>
 
             {revokeError &&
               revokeError.linkId === revokeConfirmLink.id && (
-                <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                <div className="mb-4 p-3 bg-rose-950/80 border border-rose-800/80 rounded-xl text-xs text-rose-300 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
                   <span>{revokeError.message}</span>
                 </div>
               )}
@@ -950,14 +950,14 @@ export default function DashboardPage() {
                   }
                 }}
                 disabled={!!revokingLinkId}
-                className="px-4 py-2.5 rounded-xl border border-zinc-200 text-zinc-700 hover:bg-zinc-100 font-medium text-xs transition-colors cursor-pointer disabled:opacity-50"
+                className="px-4 py-2.5 rounded-xl border border-zinc-800 text-zinc-300 hover:bg-zinc-800 font-medium text-xs transition-colors cursor-pointer disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleRevokeShareLink(revokeConfirmLink.id)}
                 disabled={!!revokingLinkId}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs transition-colors shadow-2xs cursor-pointer disabled:opacity-60"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-medium text-xs transition-colors shadow-2xs cursor-pointer disabled:opacity-60"
               >
                 {revokingLinkId === revokeConfirmLink.id ? (
                   <>
@@ -975,8 +975,8 @@ export default function DashboardPage() {
 
       {/* CONFIRMATION MODAL: DELETE FILE */}
       {deleteConfirmFile && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl border border-zinc-200 shadow-xl max-w-md w-full p-6 text-left relative animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
+          <div className="bg-[#121215] rounded-2xl border border-zinc-800 shadow-2xl max-w-md w-full p-6 text-left relative animate-in fade-in zoom-in-95 duration-150">
             <button
               onClick={() => {
                 if (!deletingFileId) {
@@ -984,25 +984,25 @@ export default function DashboardPage() {
                   setDeleteError(null);
                 }
               }}
-              className="absolute top-4 right-4 p-1 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
+              className="absolute top-4 right-4 p-1 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
 
-            <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-rose-950/60 border border-rose-800/60 flex items-center justify-center text-rose-400 mb-4">
               <Trash2 className="w-6 h-6" />
             </div>
 
-            <h3 className="text-lg font-bold text-zinc-900 tracking-tight mb-2 truncate">
+            <h3 className="text-lg font-bold text-white tracking-tight mb-2 truncate">
               Delete &quot;{deleteConfirmFile.originalName}&quot;?
             </h3>
-            <p className="text-sm text-zinc-500 mb-6 leading-relaxed">
+            <p className="text-sm text-zinc-400 mb-6 leading-relaxed">
               This will permanently remove the file and all of its share links.
             </p>
 
             {deleteError && (
-              <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+              <div className="mb-4 p-3 bg-rose-950/80 border border-rose-800/80 rounded-xl text-xs text-rose-300 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
                 <span>{deleteError}</span>
               </div>
             )}
@@ -1016,14 +1016,14 @@ export default function DashboardPage() {
                   }
                 }}
                 disabled={!!deletingFileId}
-                className="px-4 py-2.5 rounded-xl border border-zinc-200 text-zinc-700 hover:bg-zinc-100 font-medium text-xs transition-colors cursor-pointer disabled:opacity-50"
+                className="px-4 py-2.5 rounded-xl border border-zinc-800 text-zinc-300 hover:bg-zinc-800 font-medium text-xs transition-colors cursor-pointer disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDeleteFile(deleteConfirmFile.id)}
                 disabled={!!deletingFileId}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs transition-colors shadow-2xs cursor-pointer disabled:opacity-60"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-medium text-xs transition-colors shadow-2xs cursor-pointer disabled:opacity-60"
               >
                 {deletingFileId === deleteConfirmFile.id ? (
                   <>

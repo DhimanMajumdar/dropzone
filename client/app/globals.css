@@ -2,12 +2,12 @@
 
 @layer base {
   :root {
-    --background: #fafafa;
-    --foreground: #09090b;
-    --surface-card: #ffffff;
-    --surface-obsidian: #0a0a0c;
-    --border-subtle: #e4e4e7;
-    --accent-indigo: #4f46e5;
+    --background: #09090b;
+    --foreground: #f4f4f5;
+    --surface-card: #121215;
+    --surface-obsidian: #09090b;
+    --border-subtle: #27272a;
+    --accent-indigo: #6366f1;
     --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
   }
@@ -17,23 +17,28 @@
     font-family: var(--font-sans);
     background-color: var(--background);
     color: var(--foreground);
+    color-scheme: dark;
   }
 }
 
-/* Stitch Canvas Grid Pattern */
+/* Stitch Canvas Dark Radial Grid Pattern */
 .bg-grid-pattern {
-  background-size: 24px 24px;
+  background-size: 32px 32px;
   background-image: 
-    radial-gradient(circle, rgba(212, 212, 216, 0.4) 1px, transparent 1px);
+    radial-gradient(circle, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
 }
 
 .dark-grid-pattern {
-  background-size: 24px 24px;
+  background-size: 32px 32px;
   background-image: 
-    radial-gradient(circle, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+    radial-gradient(circle, rgba(99, 102, 241, 0.15) 1px, transparent 1px);
 }
 
-/* Monospace font utility for Stitch tokens & hash tags */
+/* Glow gradient utilities */
+.ambient-glow {
+  background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.18) 0%, rgba(9, 9, 11, 0) 70%);
+}
+
 .font-mono-token {
   font-family: var(--font-mono);
 }

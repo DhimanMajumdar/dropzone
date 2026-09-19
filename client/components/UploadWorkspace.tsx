@@ -14,7 +14,8 @@ import {
   CheckCircle2,
   Lock,
   RefreshCw,
-  ShieldCheck
+  ShieldCheck,
+  KeyRound
 } from 'lucide-react';
 
 function formatBytes(bytes: number, decimals = 1) {
@@ -134,10 +135,10 @@ export default function UploadWorkspace() {
       });
 
       if (!uploadResponse.ok) {
-        throw new Error('Direct S3 file upload failed');
+        throw new Error('Direct secure file transfer failed');
       }
 
-      // 3. Save metadata in PostgreSQL
+      // 3. Save file record
       const saveResponse = await fetch('http://localhost:5000/api/files', {
         method: 'POST',
         headers: {
@@ -264,37 +265,37 @@ export default function UploadWorkspace() {
 
   return (
     <div className="w-full max-w-2xl mx-auto py-8 px-4">
-      {/* Stitch Design System Card Structure */}
-      <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden">
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/70">
+      {/* Dark Obsidian Card Container */}
+      <div className="bg-[#121215] rounded-2xl border border-zinc-800/90 shadow-2xl overflow-hidden backdrop-blur-md">
+        {/* Card Header */}
+        <div className="px-6 py-4 border-b border-zinc-800 flex items-center justify-between bg-[#09090b]/80">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#4f46e5] flex items-center justify-center text-white shadow-xs">
-              <UploadCloud className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-2xs">
+              <UploadCloud className="w-4.5 h-4.5" />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-zinc-900 leading-tight">DropZone Workspace</h2>
-              <p className="text-[11px] font-mono text-zinc-500">Private S3 Transit Layer</p>
+              <h2 className="text-sm font-bold text-white leading-tight">DropZone Workspace</h2>
+              <p className="text-[11px] font-mono text-zinc-400">Private Data Transit Layer</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 text-[11px] font-mono font-medium text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded border border-indigo-200">
-            <Lock className="w-3 h-3 text-indigo-600" />
+          <div className="flex items-center gap-1.5 text-[11px] font-mono font-medium text-indigo-400 bg-indigo-950/60 px-2.5 py-1 rounded-md border border-indigo-800/60">
+            <Lock className="w-3 h-3 text-indigo-400" />
             <span>ENCRYPTED SESSION</span>
           </div>
         </div>
 
         <div className="p-6 sm:p-8">
           {errorMsg && (
-            <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs font-medium flex items-center justify-between">
+            <div className="mb-6 p-4 rounded-xl bg-rose-950/80 border border-rose-800/80 text-rose-300 text-xs font-medium flex items-center justify-between">
               <span>{errorMsg}</span>
-              <button onClick={() => setErrorMsg(null)} className="text-red-500 hover:text-red-800">
+              <button onClick={() => setErrorMsg(null)} className="text-rose-400 hover:text-rose-200">
                 <X className="w-4 h-4" />
               </button>
             </div>
           )}
 
-          {/* STATE 1: Empty Drop Target (Stitch Design Specification) */}
+          {/* STATE 1: Empty Drop Target */}
           {!selectedFile && !uploadedFile && !shareUrl && (
             <div
               onDragOver={handleDragOver}
@@ -302,8 +303,8 @@ export default function UploadWorkspace() {
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
               className={`border-2 border-dashed rounded-xl p-10 text-center transition-all cursor-pointer group ${isDragging
-                ? 'border-[#4f46e5] bg-indigo-50/50 scale-[0.995]'
-                : 'border-zinc-300 hover:border-[#4f46e5] bg-zinc-50/50 hover:bg-indigo-50/20'
+                ? 'border-indigo-500 bg-indigo-950/30 scale-[0.995]'
+                : 'border-zinc-800 hover:border-indigo-500/80 bg-zinc-950/50 hover:bg-indigo-950/20'
                 }`}
             >
               <input
@@ -313,20 +314,20 @@ export default function UploadWorkspace() {
                 className="hidden"
               />
 
-              <div className="w-12 h-12 rounded-xl bg-white shadow-xs border border-zinc-200 flex items-center justify-center mx-auto mb-4 text-[#4f46e5] group-hover:scale-105 transition-all">
+              <div className="w-12 h-12 rounded-xl bg-[#121215] shadow-2xs border border-zinc-800 flex items-center justify-center mx-auto mb-4 text-indigo-400 group-hover:scale-105 transition-all">
                 <UploadCloud className="w-6 h-6" />
               </div>
 
-              <h3 className="font-semibold text-zinc-900 text-base mb-1">
+              <h3 className="font-bold text-white text-base mb-1 tracking-tight">
                 Drop your file here
               </h3>
-              <p className="text-xs text-zinc-500 mb-4">
-                or <span className="text-[#4f46e5] font-medium underline underline-offset-2">browse from your device</span>
+              <p className="text-xs text-zinc-400 mb-4 font-normal">
+                or <span className="text-indigo-400 font-medium underline underline-offset-2">browse from your device</span>
               </p>
 
-              <div className="inline-flex items-center gap-1.5 text-[11px] font-mono text-zinc-400 bg-white px-3 py-1 rounded border border-zinc-200 shadow-2xs">
-                <ShieldCheck className="w-3 h-3 text-indigo-500" />
-                Files remain private in S3 storage
+              <div className="inline-flex items-center gap-1.5 text-[11px] font-mono text-zinc-400 bg-[#09090b] px-3 py-1 rounded-md border border-zinc-800">
+                <ShieldCheck className="w-3 h-3 text-indigo-400" />
+                Files remain private in encrypted storage
               </div>
             </div>
           )}
@@ -334,16 +335,16 @@ export default function UploadWorkspace() {
           {/* STATE 2: File Selected */}
           {selectedFile && !uploading && !uploadedFile && (
             <div className="space-y-6">
-              <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-4 flex items-center justify-between gap-4">
+              <div className="bg-[#09090b] border border-zinc-800 rounded-xl p-4 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-lg bg-indigo-50 border border-indigo-100 text-[#4f46e5] flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
                     <FileText className="w-5 h-5" />
                   </div>
                   <div className="min-w-0">
-                    <h4 className="text-sm font-semibold text-zinc-900 truncate">
+                    <h4 className="text-sm font-semibold text-white truncate">
                       {selectedFile.name}
                     </h4>
-                    <p className="text-xs font-mono text-zinc-500">
+                    <p className="text-xs font-mono text-zinc-400 mt-0.5">
                       {formatBytes(selectedFile.size)} · {selectedFile.type || 'binary payload'}
                     </p>
                   </div>
@@ -351,7 +352,7 @@ export default function UploadWorkspace() {
 
                 <button
                   onClick={handleRemoveSelectedFile}
-                  className="p-1.5 rounded text-zinc-400 hover:text-zinc-600 hover:bg-zinc-200/60 transition-colors"
+                  className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
                   title="Remove file"
                 >
                   <X className="w-4 h-4" />
@@ -360,9 +361,9 @@ export default function UploadWorkspace() {
 
               <button
                 onClick={executeUpload}
-                className="w-full py-3 rounded-lg bg-[#4f46e5] hover:bg-indigo-700 text-white font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(99,102,241,0.25)] cursor-pointer active:scale-[0.99]"
               >
-                <UploadCloud className="w-4 h-4" />
+                <UploadCloud className="w-4.5 h-4.5" />
                 Upload to DropZone
               </button>
             </div>
@@ -370,13 +371,13 @@ export default function UploadWorkspace() {
 
           {/* STATE 3: Uploading Loader */}
           {uploading && (
-            <div className="py-10 text-center space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mx-auto text-[#4f46e5]">
-                <Loader2 className="w-5 h-5 animate-spin" />
+            <div className="py-12 text-center space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto text-indigo-400 shadow-2xs">
+                <Loader2 className="w-6 h-6 animate-spin" />
               </div>
               <div>
-                <h4 className="font-semibold text-zinc-900 text-sm">Uploading payload...</h4>
-                <p className="text-xs font-mono text-zinc-500 mt-0.5">Streaming directly into S3 private bucket</p>
+                <h4 className="font-bold text-white text-sm">Uploading payload...</h4>
+                <p className="text-xs font-mono text-zinc-400 mt-1">Streaming directly into encrypted storage</p>
               </div>
             </div>
           )}
@@ -384,27 +385,28 @@ export default function UploadWorkspace() {
           {/* STATE 4: Uploaded Ready for Share Link */}
           {uploadedFile && !shareUrl && (
             <div className="space-y-6">
-              <div className="bg-emerald-50/80 border border-emerald-200 rounded-xl p-4">
+              <div className="bg-emerald-950/40 border border-emerald-800/60 rounded-xl p-4">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-8 h-8 rounded bg-emerald-600 text-white flex items-center justify-center shrink-0">
-                    <CheckCircle2 className="w-4 h-4" />
+                    <CheckCircle2 className="w-4.5 h-4.5" />
                   </div>
                   <div>
-                    <span className="text-[11px] font-mono font-semibold text-emerald-800 uppercase tracking-wider">
+                    <span className="text-[11px] font-mono font-semibold text-emerald-400 uppercase tracking-wider">
                       Payload Sealed
                     </span>
-                    <h4 className="text-sm font-semibold text-zinc-900 truncate">
+                    <h4 className="text-sm font-semibold text-white truncate">
                       {uploadedFile.originalName}
                     </h4>
                   </div>
                 </div>
-                <p className="text-xs font-mono text-emerald-700">
-                  Size: {formatBytes(uploadedFile.size)} · Metadata linked in PostgreSQL
+                <p className="text-xs font-mono text-emerald-400/80">
+                  Size: {formatBytes(uploadedFile.size)} · Encrypted &amp; Registered
                 </p>
               </div>
+              
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-zinc-900 mb-1.5">
+                  <label className="block text-xs font-medium text-zinc-300 mb-1.5 font-mono">
                     Link expiry
                   </label>
 
@@ -413,7 +415,7 @@ export default function UploadWorkspace() {
                     onChange={(event) =>
                       setExpiresIn(event.target.value)
                     }
-                    className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    className="w-full rounded-xl border border-zinc-800 bg-[#09090b] px-3.5 py-2.5 text-sm text-white outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                   >
                     <option value="1h">1 hour</option>
                     <option value="24h">24 hours</option>
@@ -423,7 +425,7 @@ export default function UploadWorkspace() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-zinc-900 mb-1.5">
+                  <label className="block text-xs font-medium text-zinc-300 mb-1.5 font-mono">
                     Maximum downloads
                   </label>
 
@@ -435,7 +437,7 @@ export default function UploadWorkspace() {
                     onChange={(event) =>
                       setMaxDownloads(event.target.value)
                     }
-                    className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    className="w-full rounded-xl border border-zinc-800 bg-[#09090b] px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                   />
                 </div>
 
@@ -446,15 +448,15 @@ export default function UploadWorkspace() {
                     onChange={(event) =>
                       setDeleteAfterDownload(event.target.checked)
                     }
-                    className="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
+                    className="h-4 w-4 rounded border-zinc-700 bg-[#09090b] text-indigo-600 focus:ring-indigo-500"
                   />
 
-                  <span className="text-sm text-zinc-700">
+                  <span className="text-sm text-zinc-300">
                     Delete file after download
                   </span>
                 </label>
 
-                <div className="space-y-2 pt-1">
+                <div className="space-y-2 pt-1 border-t border-zinc-800/60">
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input
                       type="checkbox"
@@ -463,43 +465,45 @@ export default function UploadWorkspace() {
                         setPasswordEnabled(event.target.checked);
                         if (!event.target.checked) setPassword('');
                       }}
-                      className="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
+                      className="h-4 w-4 rounded border-zinc-700 bg-[#09090b] text-indigo-600 focus:ring-indigo-500"
                     />
 
-                    <span className="text-sm text-zinc-700 font-medium">
+                    <span className="text-sm text-zinc-200 font-medium flex items-center gap-1.5">
+                      <KeyRound className="w-3.5 h-3.5 text-indigo-400" />
                       Password protect this link
                     </span>
                   </label>
 
                   {passwordEnabled && (
-                    <div className="pl-7 space-y-1">
+                    <div className="pl-7 space-y-1.5">
                       <input
                         type="password"
                         placeholder="Enter password for link"
                         value={password}
                         onChange={(event) => setPassword(event.target.value)}
-                        className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-mono"
+                        className="w-full rounded-xl border border-zinc-800 bg-[#09090b] px-3.5 py-2 text-sm text-white placeholder:text-zinc-600 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-mono"
                       />
-                      <p className="text-[11px] text-zinc-500">
+                      <p className="text-[11px] text-zinc-400">
                         Recipients will be required to enter this password to download the file.
                       </p>
                     </div>
                   )}
                 </div>
               </div>
+
               <button
                 onClick={createShareLink}
                 disabled={creatingLink}
-                className="w-full py-3 rounded-lg bg-[#4f46e5] hover:bg-indigo-700 text-white font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer disabled:opacity-50"
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(99,102,241,0.25)] cursor-pointer disabled:opacity-50 active:scale-[0.99]"
               >
                 {creatingLink ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-4.5 h-4.5 animate-spin" />
                     Generating link...
                   </>
                 ) : (
                   <>
-                    <Share2 className="w-4 h-4" />
+                    <Share2 className="w-4.5 h-4.5" />
                     Create share link
                   </>
                 )}
@@ -507,37 +511,37 @@ export default function UploadWorkspace() {
             </div>
           )}
 
-          {/* STATE 5: Share Link Result Card (Stitch Specification) */}
+          {/* STATE 5: Share Link Result Card */}
           {shareUrl && (
             <div className="space-y-6">
               <div className="text-center pb-1">
-                <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3">
-                  <CheckCircle2 className="w-5 h-5" />
+                <div className="w-12 h-12 rounded-2xl bg-emerald-950/60 border border-emerald-800/80 text-emerald-400 flex items-center justify-center mx-auto mb-3 shadow-2xs">
+                  <CheckCircle2 className="w-6 h-6" />
                 </div>
-                <h3 className="font-bold text-zinc-900 text-lg">Your file is ready to share</h3>
-                <p className="text-xs text-zinc-500 mt-1">Presigned S3 access URL forged successfully</p>
+                <h3 className="font-extrabold text-white text-xl tracking-tight">Your file is ready to share</h3>
+                <p className="text-xs text-zinc-400 mt-1">Secure access link generated successfully</p>
               </div>
 
-              <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-4 space-y-2">
-                <label className="text-[11px] font-mono font-semibold text-zinc-500 uppercase tracking-wider block">
-                  Presigned Share URL
+              <div className="bg-[#09090b] border border-zinc-800 rounded-xl p-4 space-y-2">
+                <label className="text-[11px] font-mono font-semibold text-zinc-400 uppercase tracking-wider block">
+                  Secure Share URL
                 </label>
                 <input
                   type="text"
                   readOnly
                   value={shareUrl}
-                  className="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs font-mono text-zinc-800 select-all focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full bg-[#121215] border border-zinc-800 rounded-lg px-3.5 py-2 text-xs font-mono text-indigo-300 select-all focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   onClick={handleCopyLink}
-                  className="py-2.5 px-4 rounded-lg bg-[#4f46e5] hover:bg-indigo-700 text-white font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                  className="py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(99,102,241,0.25)] cursor-pointer"
                 >
                   {copied ? (
                     <>
-                      <Check className="w-4 h-4" />
+                      <Check className="w-4 h-4 text-emerald-400" />
                       Copied!
                     </>
                   ) : (
@@ -550,9 +554,9 @@ export default function UploadWorkspace() {
 
                 <button
                   onClick={() => window.open(shareUrl, '_blank')}
-                  className="py-2.5 px-4 rounded-lg bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 font-medium text-sm transition-colors flex items-center justify-center gap-2 shadow-2xs cursor-pointer"
+                  className="py-3 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 font-medium text-sm transition-colors flex items-center justify-center gap-2 shadow-2xs cursor-pointer"
                 >
-                  <ExternalLink className="w-4 h-4" />
+                  <ExternalLink className="w-4 h-4 text-zinc-400" />
                   Open link
                 </button>
               </div>
@@ -560,7 +564,7 @@ export default function UploadWorkspace() {
               <div className="pt-2 text-center">
                 <button
                   onClick={resetAll}
-                  className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-[#4f46e5] transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-400 hover:text-indigo-400 transition-colors cursor-pointer"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                   Upload another payload

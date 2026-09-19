@@ -17,7 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: 'DropZone — Share files. Without the baggage.',
-  description: 'The secure, ephemeral file transit layer for teams who care about privacy. Drop your files, generate presigned links, and share instantly.',
+  description: 'The secure, ephemeral file transit layer for teams who care about privacy. Drop your files, generate secure share links, and transfer instantly.',
   icons: {
     icon: '/favicon.ico',
   },
@@ -30,8 +30,8 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${geist.variable} ${jetbrainsMono.variable} antialiased`}>
-        <body className="bg-[#fafafa] text-[#09090b] min-h-screen selection:bg-[#4f46e5] selection:text-white font-sans">
+      <html lang="en" className={`${geist.variable} ${jetbrainsMono.variable} antialiased dark`}>
+        <body className="bg-[#09090b] text-[#f4f4f5] min-h-screen selection:bg-[#6366f1] selection:text-white font-sans antialiased">
           {children}
         </body>
       </html>

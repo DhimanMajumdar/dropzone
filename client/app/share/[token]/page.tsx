@@ -170,21 +170,21 @@ export default function SharePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] flex flex-col justify-between selection:bg-[#4f46e5] selection:text-white bg-grid-pattern">
+    <div className="min-h-screen bg-[#09090b] text-[#f4f4f5] flex flex-col justify-between selection:bg-[#6366f1] selection:text-white dark-grid-pattern">
       {/* Header */}
-      <header className="w-full py-5 px-4 border-b border-zinc-200 bg-white/80 backdrop-blur-md">
+      <header className="w-full py-5 px-4 border-b border-zinc-800 bg-[#09090b]/80 backdrop-blur-md">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-[#4f46e5] flex items-center justify-center text-white shadow-xs">
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-xs">
               <UploadCloud className="w-4.5 h-4.5" />
             </div>
-            <span className="font-bold text-zinc-900 tracking-tight text-base">
+            <span className="font-bold text-white tracking-tight text-base">
               DropZone
             </span>
           </Link>
 
-          <div className="flex items-center gap-1.5 text-[11px] font-mono text-zinc-500 bg-zinc-100 px-2.5 py-1 rounded border border-zinc-200">
-            <Lock className="w-3 h-3 text-emerald-600" />
+          <div className="flex items-center gap-1.5 text-[11px] font-mono text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-md border border-emerald-800/60">
+            <Lock className="w-3 h-3 text-emerald-400" />
             SECURE PUBLIC DOWNLOAD
           </div>
         </div>
@@ -193,7 +193,7 @@ export default function SharePage() {
       {/* Main Download / Password Card */}
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6 py-12">
         <div className="w-full max-w-md mx-auto">
-          <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden p-6 sm:p-8 text-center relative">
+          <div className="bg-[#121215] rounded-2xl border border-zinc-800 shadow-2xl overflow-hidden p-6 sm:p-8 text-center relative">
             
             {errorType ? (
               /* ERROR STATE DISPLAY */
@@ -202,23 +202,23 @@ export default function SharePage() {
                 const Icon = err.icon;
                 return (
                   <div className="py-2">
-                    <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto mb-4">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-950/60 border border-amber-800/60 text-amber-400 flex items-center justify-center mx-auto mb-4">
                       <Icon className="w-6 h-6" />
                     </div>
 
-                    <h2 className="text-lg font-bold text-zinc-900 mb-2">
+                    <h2 className="text-lg font-bold text-white mb-2 tracking-tight">
                       {err.title}
                     </h2>
 
-                    <p className="text-xs text-zinc-500 mb-6 leading-relaxed">
+                    <p className="text-xs text-zinc-400 mb-6 leading-relaxed">
                       {err.description}
                     </p>
 
                     <Link
                       href="/"
-                      className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-medium text-sm transition-colors"
+                      className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-medium text-sm transition-colors border border-zinc-700/60"
                     >
-                      <ArrowLeft className="w-4 h-4" />
+                      <ArrowLeft className="w-4 h-4 text-zinc-400" />
                       Go to DropZone Home
                     </Link>
                   </div>
@@ -227,20 +227,20 @@ export default function SharePage() {
             ) : isPasswordRequired ? (
               /* PASSWORD PROTECTED FORM DISPLAY */
               <div className="py-2 text-left">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#4f46e5] mx-auto mb-4 shadow-2xs">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mx-auto mb-4 shadow-2xs">
                   <Lock className="w-6 h-6" />
                 </div>
 
-                <h2 className="text-xl font-bold text-zinc-900 text-center tracking-tight mb-1">
+                <h2 className="text-xl font-extrabold text-white text-center tracking-tight mb-1">
                   🔒 Password Protected
                 </h2>
-                <p className="text-xs text-zinc-500 text-center mb-6">
+                <p className="text-xs text-zinc-400 text-center mb-6">
                   This file is protected by a password.
                 </p>
 
                 <form onSubmit={handlePasswordSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-xs font-medium text-zinc-700 mb-1.5">
+                    <label className="block text-xs font-medium text-zinc-300 mb-1.5 font-mono">
                       Password
                     </label>
                     <input
@@ -251,12 +251,12 @@ export default function SharePage() {
                         setPasswordError(null);
                       }}
                       placeholder="Enter password to unlock"
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-zinc-200 bg-zinc-50 text-sm text-zinc-900 outline-none focus:border-[#4f46e5] focus:bg-white focus:ring-1 focus:ring-[#4f46e5] font-mono transition-all"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-800 bg-[#09090b] text-sm text-white placeholder:text-zinc-600 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-mono transition-all"
                       autoFocus
                     />
                     {passwordError && (
-                      <p className="text-xs text-rose-600 mt-1.5 font-medium flex items-center gap-1">
-                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                      <p className="text-xs text-rose-400 mt-1.5 font-medium flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-400" />
                         <span>{passwordError}</span>
                       </p>
                     )}
@@ -265,7 +265,7 @@ export default function SharePage() {
                   <button
                     type="submit"
                     disabled={submittingPassword || !password}
-                    className="w-full py-3.5 px-4 rounded-lg bg-[#4f46e5] hover:bg-indigo-700 text-white font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer disabled:opacity-50"
+                    className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(99,102,241,0.25)] cursor-pointer disabled:opacity-50 active:scale-[0.99]"
                   >
                     {submittingPassword ? (
                       <>
@@ -281,37 +281,37 @@ export default function SharePage() {
                   </button>
                 </form>
 
-                <div className="mt-6 pt-4 border-t border-zinc-100 flex items-center justify-center gap-1.5 text-xs text-zinc-500 font-medium">
-                  <ShieldCheck className="w-4 h-4 text-[#4f46e5]" />
-                  <span>Verified with bcrypt password hash.</span>
+                <div className="mt-6 pt-4 border-t border-zinc-800/80 flex items-center justify-center gap-1.5 text-xs text-zinc-400 font-medium">
+                  <ShieldCheck className="w-4 h-4 text-indigo-400" />
+                  <span>Protected by end-to-end access verification.</span>
                 </div>
               </div>
             ) : (
               /* NORMAL DOWNLOAD DISPLAY */
               <>
                 {/* Top Logo Badge */}
-                <div className="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mx-auto mb-5 text-[#4f46e5]">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-5 text-indigo-400 shadow-2xs">
                   <UploadCloud className="w-6 h-6" />
                 </div>
 
-                <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight mb-1">
+                <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight mb-1">
                   Someone shared a file with you
                 </h1>
-                <p className="text-xs text-zinc-500 mb-6">
-                  Click below to securely retrieve the payload directly from S3 private storage.
+                <p className="text-xs text-zinc-400 mb-6">
+                  Click below to securely retrieve the file from encrypted vault storage.
                 </p>
 
                 {/* File Preview Pill */}
-                <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-4 mb-6 flex items-center gap-3 text-left">
-                  <div className="w-10 h-10 rounded-lg bg-indigo-50 border border-indigo-100 text-[#4f46e5] flex items-center justify-center shrink-0">
+                <div className="bg-[#09090b] border border-zinc-800 rounded-xl p-4 mb-6 flex items-center gap-3 text-left">
+                  <div className="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
                     <FileText className="w-5 h-5" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h4 className="text-sm font-semibold text-zinc-900 truncate">
+                    <h4 className="text-sm font-semibold text-white truncate">
                       {fileName || 'Shared Payload'}
                     </h4>
-                    <p className="text-xs font-mono text-zinc-500">
-                      {fileName?.endsWith('.pdf') ? 'PDF Payload' : 'Ephemeral Payload'} · Presigned Link Valid
+                    <p className="text-xs font-mono text-zinc-400">
+                      {fileName?.endsWith('.pdf') ? 'PDF Document' : 'Encrypted File'} · Transfer Link Active
                     </p>
                   </div>
                 </div>
@@ -320,7 +320,7 @@ export default function SharePage() {
                 <button
                   onClick={() => downloadFile()}
                   disabled={loading}
-                  className="w-full py-3.5 px-6 rounded-lg bg-[#4f46e5] hover:bg-indigo-700 text-white font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer disabled:opacity-60 mb-4"
+                  className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(99,102,241,0.25)] cursor-pointer disabled:opacity-60 mb-4 active:scale-[0.99]"
                 >
                   {loading ? (
                     <>
@@ -329,7 +329,7 @@ export default function SharePage() {
                     </>
                   ) : downloadSuccess ? (
                     <>
-                      <CheckCircle2 className="w-4.5 h-4.5" />
+                      <CheckCircle2 className="w-4.5 h-4.5 text-emerald-400" />
                       Downloading...
                     </>
                   ) : (
@@ -341,8 +341,8 @@ export default function SharePage() {
                 </button>
 
                 {/* Supporting Security Text */}
-                <div className="flex items-center justify-center gap-1.5 text-xs text-zinc-500 font-medium">
-                  <ShieldCheck className="w-4 h-4 text-[#4f46e5]" />
+                <div className="flex items-center justify-center gap-1.5 text-xs text-zinc-400 font-medium">
+                  <ShieldCheck className="w-4 h-4 text-indigo-400" />
                   <span>Your download is handled securely.</span>
                 </div>
               </>
@@ -352,9 +352,9 @@ export default function SharePage() {
       </main>
 
       {/* Footer */}
-      <footer className="py-6 border-t border-zinc-200 bg-white/50 text-center">
-        <p className="text-xs text-zinc-400 font-mono">
-          Powered by <strong className="text-zinc-700 font-sans">DropZone</strong> — Ephemeral Data Transit
+      <footer className="py-6 border-t border-zinc-800/80 bg-[#09090b] text-center">
+        <p className="text-xs text-zinc-500 font-mono">
+          Powered by <strong className="text-zinc-300 font-sans">DropZone</strong> — Ephemeral Data Transit
         </p>
       </footer>
     </div>
