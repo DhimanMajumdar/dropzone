@@ -47,6 +47,8 @@ export default function UploadWorkspace() {
   const [expiresIn, setExpiresIn] = useState('24h');
   const [maxDownloads, setMaxDownloads] = useState('');
   const [deleteAfterDownload, setDeleteAfterDownload] = useState(false);
+  const [passwordEnabled, setPasswordEnabled] = useState(false);
+  const [password, setPassword] = useState('');
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -202,6 +204,14 @@ export default function UploadWorkspace() {
         expiresAt = date.toISOString();
       }
 
+      if (passwordEnabled) {
+        if (!password || password.trim().length === 0) {
+          setErrorMsg('Please enter a password for your protected link.');
+          setCreatingLink(false);
+          return;
+        }
+      }
+
       const response = await fetch('http://localhost:5000/api/share-links', {
         method: 'POST',
         headers: {
@@ -215,6 +225,7 @@ export default function UploadWorkspace() {
             ? Number(maxDownloads)
             : null,
           deleteAfterDownload,
+          password: passwordEnabled && password.trim() ? password.trim() : null,
         }),
       });
 
@@ -224,6 +235,8 @@ export default function UploadWorkspace() {
       }
 
       setShareUrl(data.shareUrl);
+      setPasswordEnabled(false);
+      setPassword('');
     } catch (err: any) {
       console.error('Share link error:', err);
       setErrorMsg(err.message || 'Failed to create share link');
@@ -440,6 +453,39 @@ export default function UploadWorkspace() {
                     Delete file after download
                   </span>
                 </label>
+
+                <div className="space-y-2 pt-1">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={passwordEnabled}
+                      onChange={(event) => {
+                        setPasswordEnabled(event.target.checked);
+                        if (!event.target.checked) setPassword('');
+                      }}
+                      className="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
+                    />
+
+                    <span className="text-sm text-zinc-700 font-medium">
+                      Password protect this link
+                    </span>
+                  </label>
+
+                  {passwordEnabled && (
+                    <div className="pl-7 space-y-1">
+                      <input
+                        type="password"
+                        placeholder="Enter password for link"
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                        className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-mono"
+                      />
+                      <p className="text-[11px] text-zinc-500">
+                        Recipients will be required to enter this password to download the file.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
               <button
                 onClick={createShareLink}

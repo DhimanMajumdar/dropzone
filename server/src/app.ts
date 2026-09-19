@@ -2,7 +2,8 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { clerkClient, clerkMiddleware, getAuth } from '@clerk/express';
-import { db } from './prisma/db'
+import { db } from './prisma/db';
+import bcrypt from 'bcryptjs';
 
 import dashboardRoutes from './routes/dashboard.routes';
 import shareLinksRoutes from './routes/share-links.routes';
@@ -194,7 +195,8 @@ app.post('/api/share-links', async (req, res) => {
         fileId,
         expiresAt,
         maxDownloads,
-        passwordHash,
+        password,
+        passwordHash: rawPasswordHash,
         deleteAfterDownload,
     } = req.body;
 
@@ -234,6 +236,18 @@ app.post('/api/share-links', async (req, res) => {
             });
         }
 
+        let passwordHash: string | null = null;
+        if (password && typeof password === 'string' && password.trim().length > 0) {
+            if (password.length > 128) {
+                return res.status(400).json({
+                    error: 'Password is too long (maximum 128 characters)',
+                });
+            }
+            passwordHash = await bcrypt.hash(password.trim(), 12);
+        } else if (rawPasswordHash && typeof rawPasswordHash === 'string') {
+            passwordHash = rawPasswordHash;
+        }
+
         // Generate secure random token
         const token = crypto.randomBytes(32).toString('hex');
 
@@ -245,7 +259,7 @@ app.post('/api/share-links', async (req, res) => {
             maxDownloads: maxDownloads
                 ? Number(maxDownloads)
                 : null,
-            passwordHash: passwordHash || null,
+            passwordHash,
             deleteAfterDownload: Boolean(deleteAfterDownload),
         });
 
@@ -267,7 +281,7 @@ app.post('/api/share-links', async (req, res) => {
     }
 });
 
-app.get('/api/share-links/:token/download', downloadRateLimiter, async (req, res) => {
+const handleDownloadRequest = async (req: express.Request, res: express.Response) => {
     const token = req.params.token;
 
     if (!token || typeof token !== 'string') {
@@ -315,7 +329,28 @@ app.get('/api/share-links/:token/download', downloadRateLimiter, async (req, res
             });
         }
 
-        // 5. Find the actual file
+        // 5. Verify Password (if password-protected)
+        if (shareLink.passwordHash) {
+            const password = req.body?.password;
+
+            if (!password || typeof password !== 'string' || password.trim().length === 0) {
+                return res.status(401).json({
+                    error: 'Password required',
+                    code: 'PASSWORD_REQUIRED',
+                });
+            }
+
+            const isPasswordValid = await bcrypt.compare(password, shareLink.passwordHash);
+
+            if (!isPasswordValid) {
+                return res.status(401).json({
+                    error: 'Incorrect password',
+                    code: 'INVALID_PASSWORD',
+                });
+            }
+        }
+
+        // 6. Find the actual file
         const file = await db.orm.public.File.first({
             id: shareLink.fileId,
         });
@@ -326,26 +361,26 @@ app.get('/api/share-links/:token/download', downloadRateLimiter, async (req, res
             });
         }
 
-        // 6. Record this download
+        // 7. Record this download
         await db.orm.public.Download.create({
             shareLinkId: shareLink.id,
             ipAddress: req.ip || null,
             userAgent: req.get('user-agent') || null,
         });
 
-        // 7. Increment download count
+        // 8. Increment download count
         await db.orm.public.ShareLink.where({
             id: shareLink.id,
         }).update({
             downloadCount: shareLink.downloadCount + 1,
         });
 
-        // 8. Generate temporary S3 download URL
+        // 9. Generate temporary S3 download URL
         const downloadUrl = await createDownloadUrl(
             file.storageKey,
         );
 
-        // 9. Schedule cleanup if "delete after download" is enabled
+        // 10. Schedule cleanup if "delete after download" is enabled
         if (shareLink.deleteAfterDownload) {
             await fileCleanupQueue.add(
                 'delete-after-download',
@@ -371,21 +406,24 @@ app.get('/api/share-links/:token/download', downloadRateLimiter, async (req, res
             );
         }
 
-        // 10. Return download URL
+        // 11. Return download URL
         return res.json({
             downloadUrl,
             fileName: file.originalName,
         });
     } catch (error) {
         console.error(
-            'Failed to create download URL:',
+            'Failed to process download request:',
             error,
         );
 
         return res.status(500).json({
-            error: 'Failed to create download URL',
+            error: 'Failed to process download request',
         });
     }
-});
+};
+
+app.post('/api/share-links/:token/download', downloadRateLimiter, handleDownloadRequest);
+app.get('/api/share-links/:token/download', downloadRateLimiter, handleDownloadRequest);
 
 export default app;
