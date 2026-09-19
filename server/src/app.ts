@@ -7,6 +7,8 @@ import { db } from './prisma/db'
 import { createDownloadUrl, createUploadUrl } from './services/s3.service';
 import crypto from 'crypto';
 
+import { fileCleanupQueue } from './queues/fileCleanup.queue';
+
 const app = express();
 
 app.use(cors());
@@ -261,7 +263,7 @@ app.get('/api/share-links/:token/download', async (req, res) => {
     }
 
     try {
-        // Find share link
+        // 1. Find the share link
         const shareLink = await db.orm.public.ShareLink.first({
             token,
         });
@@ -272,14 +274,14 @@ app.get('/api/share-links/:token/download', async (req, res) => {
             });
         }
 
-        // Check if link is revoked
+        // 2. Check if the link is revoked
         if (shareLink.revoked) {
             return res.status(403).json({
                 error: 'Share link has been revoked',
             });
         }
 
-        // Check expiry
+        // 3. Check if the link has expired
         if (
             shareLink.expiresAt &&
             new Date(shareLink.expiresAt) <= new Date()
@@ -289,7 +291,7 @@ app.get('/api/share-links/:token/download', async (req, res) => {
             });
         }
 
-        // Check download limit
+        // 4. Check download limit
         if (
             shareLink.maxDownloads !== null &&
             shareLink.downloadCount >= shareLink.maxDownloads
@@ -299,7 +301,7 @@ app.get('/api/share-links/:token/download', async (req, res) => {
             });
         }
 
-        // Find associated file
+        // 5. Find the actual file
         const file = await db.orm.public.File.first({
             id: shareLink.fileId,
         });
@@ -310,11 +312,52 @@ app.get('/api/share-links/:token/download', async (req, res) => {
             });
         }
 
-        // Generate short-lived S3 download URL
+        // 6. Record this download
+        await db.orm.public.Download.create({
+            shareLinkId: shareLink.id,
+            ipAddress: req.ip || null,
+            userAgent: req.get('user-agent') || null,
+        });
+
+        // 7. Increment download count
+        await db.orm.public.ShareLink.where({
+            id: shareLink.id,
+        }).update({
+            downloadCount: shareLink.downloadCount + 1,
+        });
+
+        // 8. Generate temporary S3 download URL
         const downloadUrl = await createDownloadUrl(
             file.storageKey,
         );
 
+        // 9. Schedule cleanup if "delete after download" is enabled
+        if (shareLink.deleteAfterDownload) {
+            await fileCleanupQueue.add(
+                'delete-after-download',
+                {
+                    fileId: file.id,
+                    storageKey: file.storageKey,
+                },
+                {
+                    delay: 5 * 60 * 1000,
+                    jobId: `delete-file-${file.id}`,
+                    attempts: 3,
+                    backoff: {
+                        type: 'exponential',
+                        delay: 5000,
+                    },
+                    removeOnComplete: true,
+                    removeOnFail: false,
+                },
+            );
+
+            console.log(
+                `Cleanup scheduled for file ${file.id}`,
+            );
+        }
+
+        // 10. Return download URL
         return res.json({
             downloadUrl,
             fileName: file.originalName,

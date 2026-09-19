@@ -2,15 +2,15 @@
 
 import { useState, useRef } from 'react';
 import { useAuth } from '@clerk/nextjs';
-import { 
-  UploadCloud, 
-  FileText, 
-  X, 
-  Share2, 
-  Copy, 
-  Check, 
-  ExternalLink, 
-  Loader2, 
+import {
+  UploadCloud,
+  FileText,
+  X,
+  Share2,
+  Copy,
+  Check,
+  ExternalLink,
+  Loader2,
   CheckCircle2,
   Lock,
   RefreshCw,
@@ -43,6 +43,10 @@ export default function UploadWorkspace() {
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const [expiresIn, setExpiresIn] = useState('24h');
+  const [maxDownloads, setMaxDownloads] = useState('');
+  const [deleteAfterDownload, setDeleteAfterDownload] = useState(false);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -179,6 +183,25 @@ export default function UploadWorkspace() {
         return;
       }
 
+      let expiresAt: string | null = null;
+      if (expiresIn !== 'never') {
+        const date = new Date();
+
+        if (expiresIn === '1h') {
+          date.setHours(date.getHours() + 1);
+        }
+
+        if (expiresIn === '24h') {
+          date.setHours(date.getHours() + 24);
+        }
+
+        if (expiresIn === '7d') {
+          date.setDate(date.getDate() + 7);
+        }
+
+        expiresAt = date.toISOString();
+      }
+
       const response = await fetch('http://localhost:5000/api/share-links', {
         method: 'POST',
         headers: {
@@ -187,6 +210,11 @@ export default function UploadWorkspace() {
         },
         body: JSON.stringify({
           fileId: uploadedFile.id,
+          expiresAt,
+          maxDownloads: maxDownloads
+            ? Number(maxDownloads)
+            : null,
+          deleteAfterDownload,
         }),
       });
 
@@ -260,11 +288,10 @@ export default function UploadWorkspace() {
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded-xl p-10 text-center transition-all cursor-pointer group ${
-                isDragging
-                  ? 'border-[#4f46e5] bg-indigo-50/50 scale-[0.995]'
-                  : 'border-zinc-300 hover:border-[#4f46e5] bg-zinc-50/50 hover:bg-indigo-50/20'
-              }`}
+              className={`border-2 border-dashed rounded-xl p-10 text-center transition-all cursor-pointer group ${isDragging
+                ? 'border-[#4f46e5] bg-indigo-50/50 scale-[0.995]'
+                : 'border-zinc-300 hover:border-[#4f46e5] bg-zinc-50/50 hover:bg-indigo-50/20'
+                }`}
             >
               <input
                 ref={fileInputRef}
@@ -362,7 +389,58 @@ export default function UploadWorkspace() {
                   Size: {formatBytes(uploadedFile.size)} · Metadata linked in PostgreSQL
                 </p>
               </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-zinc-900 mb-1.5">
+                    Link expiry
+                  </label>
 
+                  <select
+                    value={expiresIn}
+                    onChange={(event) =>
+                      setExpiresIn(event.target.value)
+                    }
+                    className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                  >
+                    <option value="1h">1 hour</option>
+                    <option value="24h">24 hours</option>
+                    <option value="7d">7 days</option>
+                    <option value="never">Never</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-zinc-900 mb-1.5">
+                    Maximum downloads
+                  </label>
+
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="Unlimited"
+                    value={maxDownloads}
+                    onChange={(event) =>
+                      setMaxDownloads(event.target.value)
+                    }
+                    className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={deleteAfterDownload}
+                    onChange={(event) =>
+                      setDeleteAfterDownload(event.target.checked)
+                    }
+                    className="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+
+                  <span className="text-sm text-zinc-700">
+                    Delete file after download
+                  </span>
+                </label>
+              </div>
               <button
                 onClick={createShareLink}
                 disabled={creatingLink}
