@@ -65,6 +65,12 @@ export default function Navbar() {
 
           <Show when="signed-in">
             <div className="flex items-center gap-3">
+              <Link
+                href="/dashboard"
+                className="text-xs sm:text-sm font-medium text-zinc-700 hover:text-zinc-900 px-3 py-2 rounded-lg hover:bg-zinc-100 transition-colors"
+              >
+                Dashboard
+              </Link>
               <div className="hidden sm:flex items-center gap-1.5 text-xs font-mono font-medium text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-200">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 AUTHENTICATED

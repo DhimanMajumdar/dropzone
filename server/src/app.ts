@@ -4,6 +4,8 @@ import cors from 'cors';
 import { clerkClient, clerkMiddleware, getAuth } from '@clerk/express';
 import { db } from './prisma/db'
 
+import dashboardRoutes from './routes/dashboard.routes';
+
 import { createDownloadUrl, createUploadUrl } from './services/s3.service';
 import crypto from 'crypto';
 
@@ -23,6 +25,8 @@ app.get('/health', (_req, res) => {
         status: 'ok',
     });
 });
+
+app.use('/api/dashboard', dashboardRoutes);
 
 app.get('/api/me', async (req, res) => {
     const { isAuthenticated, userId } = getAuth(req);
