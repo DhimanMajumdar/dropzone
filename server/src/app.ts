@@ -12,6 +12,7 @@ import filesRoutes from './routes/files.routes.js';
 
 
 import { createDownloadUrl, createUploadUrl } from './services/s3.service.js';
+import { getOrCreateUser, UserSyncError } from './services/user.service.js';
 import crypto from 'crypto';
 
 import { downloadRateLimiter } from './middleware/rateLimiter.js';
@@ -55,34 +56,7 @@ app.get('/api/me', async (req, res) => {
     }
 
     try {
-        // Get user details from Clerk
-        const clerkUser = await clerkClient.users.getUser(userId);
-
-        const email = clerkUser.emailAddresses[0]?.emailAddress;
-
-        if (!email) {
-            return res.status(400).json({
-                error: 'User email not found',
-            });
-        }
-
-        // Find existing DropZone user
-        let user = await db.orm.public.User.first({
-            clerkId: userId,
-        });
-
-        // Create DropZone user if it doesn't exist
-        if (!user) {
-            user = await db.orm.public.User.create({
-                clerkId: userId,
-                email,
-                username: clerkUser.username ?? null,
-                name:
-                    [clerkUser.firstName, clerkUser.lastName]
-                        .filter(Boolean)
-                        .join(' ') || null,
-            });
-        }
+        const user = await getOrCreateUser(userId);
 
         return res.json({
             id: user.id,
@@ -91,7 +65,13 @@ app.get('/api/me', async (req, res) => {
             name: user.name,
             role: user.role,
         });
-    } catch (error) {
+    } catch (error: any) {
+        if (error instanceof UserSyncError || error?.statusCode === 400 || error?.message === 'User email not found') {
+            return res.status(error?.statusCode || 400).json({
+                error: error.message || 'User email not found',
+            });
+        }
+
         console.error('Failed to sync user:', error);
 
         return res.status(500).json({
@@ -156,15 +136,7 @@ app.post('/api/files', async (req, res) => {
     }
 
     try {
-        const user = await db.orm.public.User.first({
-            clerkId: userId,
-        });
-
-        if (!user) {
-            return res.status(404).json({
-                error: 'User not found',
-            });
-        }
+        const user = await getOrCreateUser(userId);
 
         const file = await db.orm.public.File.create({
             originalName,
@@ -181,7 +153,13 @@ app.post('/api/files', async (req, res) => {
             mimeType: file.mimeType,
             size: file.size.toString(),
         });
-    } catch (error) {
+    } catch (error: any) {
+        if (error instanceof UserSyncError || error?.statusCode === 400 || error?.message === 'User email not found') {
+            return res.status(error?.statusCode || 400).json({
+                error: error.message || 'User email not found',
+            });
+        }
+
         console.error('Failed to save file:', error);
 
         return res.status(500).json({
@@ -215,16 +193,8 @@ app.post('/api/share-links', async (req, res) => {
     }
 
     try {
-        // Find logged-in user
-        const user = await db.orm.public.User.first({
-            clerkId: userId,
-        });
-
-        if (!user) {
-            return res.status(404).json({
-                error: 'User not found',
-            });
-        }
+        // Find or sync logged-in user
+        const user = await getOrCreateUser(userId);
 
         // Find file
         const file = await db.orm.public.File.first({
@@ -280,7 +250,13 @@ app.post('/api/share-links', async (req, res) => {
             deleteAfterDownload: shareLink.deleteAfterDownload,
             shareUrl: `${process.env.CLIENT_URL}/share/${shareLink.token}`,
         });
-    } catch (error) {
+    } catch (error: any) {
+        if (error instanceof UserSyncError || error?.statusCode === 400 || error?.message === 'User email not found') {
+            return res.status(error?.statusCode || 400).json({
+                error: error.message || 'User email not found',
+            });
+        }
+
         console.error('Failed to create share link:', error);
 
         return res.status(500).json({

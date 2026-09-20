@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { getAuth } from '@clerk/express';
 
 import { db } from '../prisma/db.js';
+import { getOrCreateUser, UserSyncError } from '../services/user.service.js';
 
 const router = Router();
 
@@ -15,16 +16,8 @@ router.get('/', async (req, res) => {
             });
         }
 
-        // Find the DropZone user using Clerk ID
-        const user = await db.orm.public.User.first({
-            clerkId: userId,
-        });
-
-        if (!user) {
-            return res.status(404).json({
-                error: 'User not found',
-            });
-        }
+        // Find or sync the DropZone user using Clerk ID
+        const user = await getOrCreateUser(userId);
 
         // Get all files and share links.
         // We filter them by ownership on the server.

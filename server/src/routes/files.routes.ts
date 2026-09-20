@@ -3,6 +3,7 @@ import { getAuth } from '@clerk/express';
 
 import { db } from '../prisma/db.js';
 import { deleteFile } from '../services/s3.service.js';
+import { getOrCreateUser } from '../services/user.service.js';
 
 const router = Router();
 
@@ -23,15 +24,7 @@ router.delete('/:id', async (req, res) => {
     }
 
     try {
-        const user = await db.orm.public.User.first({
-            clerkId: userId,
-        });
-
-        if (!user) {
-            return res.status(404).json({
-                error: 'User not found',
-            });
-        }
+        const user = await getOrCreateUser(userId);
 
         const file = await db.orm.public.File.first({
             id: fileId,

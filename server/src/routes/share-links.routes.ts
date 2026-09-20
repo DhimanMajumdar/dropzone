@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { getAuth } from '@clerk/express';
 
 import { db } from '../prisma/db.js';
+import { getOrCreateUser } from '../services/user.service.js';
 
 const router = Router();
 
@@ -22,16 +23,8 @@ router.post('/:id/revoke', async (req, res) => {
     }
 
     try {
-        // Find the current DropZone user
-        const user = await db.orm.public.User.first({
-            clerkId: userId,
-        });
-
-        if (!user) {
-            return res.status(404).json({
-                error: 'User not found',
-            });
-        }
+        // Find or sync the current DropZone user
+        const user = await getOrCreateUser(userId);
 
         // Find the share link
         const shareLink =
