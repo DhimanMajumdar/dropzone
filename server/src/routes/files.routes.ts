@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { getAuth } from '@clerk/express';
 
-import { db } from '../prisma/db';
-import { deleteFile } from '../services/s3.service';
+import { db } from '../prisma/db.js';
+import { deleteFile } from '../services/s3.service.js';
 
 const router = Router();
 

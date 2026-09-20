@@ -1,9 +1,9 @@
 import 'dotenv/config';
 import { Worker } from 'bullmq';
 
-import { redis } from '../config/redis';
-import { db } from '../prisma/db';
-import { deleteFile } from '../services/s3.service';
+import { redis } from '../config/redis.js';
+import { db } from '../prisma/db.js';
+import { deleteFile } from '../services/s3.service.js';
 
 const worker = new Worker(
     'file-cleanup',

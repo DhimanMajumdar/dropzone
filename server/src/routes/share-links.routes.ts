@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { getAuth } from '@clerk/express';
 
-import { db } from '../prisma/db';
+import { db } from '../prisma/db.js';
 
 const router = Router();
 

@@ -2,21 +2,21 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { clerkClient, clerkMiddleware, getAuth } from '@clerk/express';
-import { db } from './prisma/db';
+import { db } from './prisma/db.js';
 import bcrypt from 'bcryptjs';
 
-import dashboardRoutes from './routes/dashboard.routes';
-import shareLinksRoutes from './routes/share-links.routes';
-import filesRoutes from './routes/files.routes';
+import dashboardRoutes from './routes/dashboard.routes.js';
+import shareLinksRoutes from './routes/share-links.routes.js';
+import filesRoutes from './routes/files.routes.js';
 
 
 
-import { createDownloadUrl, createUploadUrl } from './services/s3.service';
+import { createDownloadUrl, createUploadUrl } from './services/s3.service.js';
 import crypto from 'crypto';
 
-import { downloadRateLimiter } from './middleware/rateLimiter';
+import { downloadRateLimiter } from './middleware/rateLimiter.js';
 
-import { fileCleanupQueue } from './queues/fileCleanup.queue';
+import { fileCleanupQueue } from './queues/fileCleanup.queue.js';
 
 const app = express();
 
