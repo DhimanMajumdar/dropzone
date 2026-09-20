@@ -108,7 +108,7 @@ export default function UploadWorkspace() {
       }
 
       // 1. Get presigned upload URL
-      const response = await fetch('http://localhost:5000/api/files/upload-url', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/files/upload-url`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -139,7 +139,7 @@ export default function UploadWorkspace() {
       }
 
       // 3. Save file record
-      const saveResponse = await fetch('http://localhost:5000/api/files', {
+      const saveResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/files`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -213,7 +213,7 @@ export default function UploadWorkspace() {
         }
       }
 
-      const response = await fetch('http://localhost:5000/api/share-links', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/share-links`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

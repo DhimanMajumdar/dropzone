@@ -201,7 +201,7 @@ export default function DashboardPage() {
           return;
         }
 
-        const res = await fetch('http://localhost:5000/api/dashboard', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dashboard`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -258,7 +258,7 @@ export default function DashboardPage() {
       }
 
       const res = await fetch(
-        `http://localhost:5000/api/share-links/${shareLinkId}/revoke`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/share-links/${shareLinkId}/revoke`,
         {
           method: 'POST',
           headers: {
@@ -317,7 +317,7 @@ export default function DashboardPage() {
         return;
       }
 
-      const res = await fetch(`http://localhost:5000/api/files/${fileId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/files/${fileId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
