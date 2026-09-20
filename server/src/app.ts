@@ -20,7 +20,15 @@ import { fileCleanupQueue } from './queues/fileCleanup.queue.js';
 
 const app = express();
 
-app.use(cors());
+app.use(
+    cors({
+        origin: [
+            'http://localhost:3000',
+            'https://dropzone-dusky.vercel.app',
+        ],
+        credentials: true,
+    }),
+);
 app.use(express.json());
 
 app.use(clerkMiddleware());
@@ -270,7 +278,7 @@ app.post('/api/share-links', async (req, res) => {
             expiresAt: shareLink.expiresAt,
             maxDownloads: shareLink.maxDownloads,
             deleteAfterDownload: shareLink.deleteAfterDownload,
-            shareUrl: `http://localhost:3000/share/${shareLink.token}`,
+            shareUrl: `${process.env.CLIENT_URL}/share/${shareLink.token}`,
         });
     } catch (error) {
         console.error('Failed to create share link:', error);
